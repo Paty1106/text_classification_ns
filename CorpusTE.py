@@ -13,7 +13,7 @@ class CorpusTE(Corpus):
         self.dev_split = dev_split
         self.test_split = test_split
         self.label_to_id = {'Nao': 0, 'Sim': 1}
-
+        self.max_labels = len(self.label_to_id)
 
     def prepare_data(self, args):
         x_data = []
@@ -59,12 +59,21 @@ class CorpusTE(Corpus):
         #da outra classe e entao pega 2n exemplos do dev e test. um novo split de tamanho 2n é gerado
         n_mask = np.logical_not(np.array(self.y_train, dtype=bool))
         mask = np.array(self.y_train, dtype=bool)
-        pos = self.x_train[mask].reshape(-1, 50)[:size]
+
+        pos = self.x_train[mask].reshape(-1, 50)#[:size]
+        neg = self.x_train[n_mask].reshape(-1, 50)#[: pos.shape[0]]
+
+        index_p = np.random.permutation(np.arange(pos.shape[0]))[:size]
+        index_n = np.random.permutation(np.arange(neg.shape[0]))[:size]
+        pos = pos[index_p]
+        neg = neg[index_n]
+
         pos_y = np.ones(pos.shape[0])
-        neg = self.x_train[n_mask].reshape(-1, 50)[: pos.shape[0]]
-        neg_y = np.zeros(pos.shape[0])
+        neg_y = np.zeros(neg.shape[0])
+
         x = np.append(pos, neg, axis=0)
         y = np.append(pos_y, neg_y, axis=0)
+
         super().shuffle(x, y, dev_split=None, train_split=1)
 
         if self.y_test is not None:

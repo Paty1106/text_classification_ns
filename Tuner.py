@@ -47,10 +47,10 @@ class Tuner(object): #review class' name
 
         cv_result = []
         dp = []
-
+        lr_list = Tuner.lr_list(lr_limits)
         for e in range(execs):
             if not freeze_lr:
-                cnn_config.learning_rate = random.uniform(lr_limits[0], lr_limits[1]) #todo
+                cnn_config.learning_rate = lr_list[random.randint(0, len(lr_list)-1)]
             if not freeze_epochs:
                 cnn_config.num_epochs = random.randint(epoch_limits[0], epoch_limits[1])
 
@@ -59,13 +59,13 @@ class Tuner(object): #review class' name
             train_data = []
 
             for i in range(cv): #nao rand cv==1
-                self.corpus.prepare_sample(folds.x_data, folds.y_data, size=400)  # revisar se é aqui
+                #self.corpus.prepare_sample(folds.x_data, folds.y_data, size=400)  # revisar se é aqui
                 for cf in folds:
                     #model = TextCNN(cnn_config)
                     print('DISTRIBUTION')
                     print(self.corpus.train_distribution())
                     #Subsampling
-                    self.corpus.sub_sampling(size=400)
+                    self.corpus.sub_sampling(size=350)
 
                     print(self.corpus.x_train.shape)
 
@@ -76,7 +76,7 @@ class Tuner(object): #review class' name
             cv_r = np.array(cv_result)
             av_cv_r = np.average(cv_r, axis=0)
             dp.append(np.std(cv_r, axis=0)) #TODO REVER
-            dt_frame = pandas.DataFrame(np.array(train_data), columns=['epoch', 'train_loss', 'train_acc', 'val_loss', 'val_acc'])
+            dt_frame = pandas.DataFrame(np.array(train_data)[:,:5], columns=['epoch', 'train_loss', 'train_acc', 'val_loss', 'val_acc'])
             cv_res = dt_frame.groupby('epoch').mean()
             ncv = cv_res.to_numpy()
 
@@ -87,8 +87,13 @@ class Tuner(object): #review class' name
                                           self.files_config.main_dir)
         #Other files
             ResultsHandler.write_result_resume_row(av_cv_r, self.files_config, cnn_config)
-        #ResultsHandler.simple_write(dp, 'supernatural_rs/results/dp.csv')
+        ResultsHandler.simple_write(dp, '{}/dp.csv'.format(self.files_config.result_path))
 
-
-
-
+    @staticmethod
+    def lr_list(limits):
+        list = []
+        value = limits[0]
+        while value <= limits[1]:
+            list.append(value)
+            value *= 10.0
+        return list

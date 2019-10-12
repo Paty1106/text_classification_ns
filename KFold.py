@@ -11,10 +11,10 @@ class KFold (object):
         self.corpus = corpus
         self.offset = int(corpus.size / k)
         self.rand = rand
-        if rand == 0:
-            self.fold = self.new_fold
-        else:
-            self.fold = self.rand_new_fold
+        #if rand == 0:
+        self.fold = self.new_fold
+        #else:
+            #self.fold = self.rand_new_fold
         self.x_data = None
         self.y_data = None
 
@@ -30,13 +30,13 @@ class KFold (object):
         self.corpus.y_validation = self.y_data[offset_b:offset_e]
         self.corpus.y_train = np.delete(self.y_data, np.arange(offset_b, offset_e), 0)
 
-    def rand_new_fold(self):
+    """def rand_new_fold(self):
         # shuffle
         print("Shuffling data..")
         indices = np.random.permutation(np.arange(len(self.x_data)))
         self.x_data = self.x_data[indices]
         self.y_data = self.y_data[indices]
-        self.new_fold()
+        self.new_fold()"""
 
     def compute_metrics(self): #TODO
         pass

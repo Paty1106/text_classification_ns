@@ -95,7 +95,7 @@ class TwitterHashtagCorpusMultilable(object):
 
 class TwitterHashtagCorpus(object):
 
-    def __init__(self, train_file, vocab_file, dev_split=0.2, sent_max_length=50, vocab_size=8000):
+    def __init__(self, train_file, vocab_file, dev_split=0.3, sent_max_length=50, vocab_size=8000):
         # loading data
         self.dev_split = dev_split
         self.train_split = 0.7
@@ -136,16 +136,18 @@ class TwitterHashtagCorpus(object):
         x_data = x_data[indices]
         y_data = y_data[indices]
 
-        # train/validation/dev split
+        # train/validation/test split
         dtsize = len(x_data)
         num_train = int(self.train_split * dtsize)
-        num_test = int(dtsize*self.dev_split)
+        num_val = int(dtsize*self.dev_split)
         self.x_train = x_data[:num_train]
         self.y_train = y_data[:num_train]
-        self.x_test = x_data[num_train:num_train+num_test] #TODO - modificar.
-        self.y_test = y_data[num_train:num_train+num_test]
-        self.x_validation = x_data[num_train+num_test:]
-        self.y_validation = y_data[num_train+num_test:]
+
+        self.x_validation = x_data[num_train:num_train+num_val]
+        self.y_validation = y_data[num_train:num_train+num_val]
+
+        self.x_test = x_data[num_train + num_val:]  # TODO - modificar.
+        self.y_test = y_data[num_train + num_val:]
 
     def __str__(self):
         return 'Training: {},Validation{},Testing: {}, Vocabulary: {}'.format(len(self.x_train), len(self.x_validation),

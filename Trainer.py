@@ -86,6 +86,8 @@ class Trainer(object):
         return datetime.timedelta(seconds=int(round(time_dif)))
 
     def evaluate(self, data):
+        task_labels = np.arange(self.corpus.max_labels)
+
         """
         Evaluation, return accuracy and loss
         """
@@ -95,7 +97,7 @@ class Trainer(object):
         data_len = len(data)
         total_loss = 0.0
         y_true, y_pred = [], []
-
+        f1 = []
         for data, label in data_loader:
             data, label = torch.tensor(data), torch.tensor(label)
             if use_cuda:
@@ -110,11 +112,14 @@ class Trainer(object):
             pred = torch.max(output.data, dim=1)[1].cpu().numpy().tolist() #torch.max -> (value, index)
             y_pred.extend(pred)
             y_true.extend(label.data)
+            f = metrics.f1_score(y_true, y_pred, labels=task_labels, average=None)
+            f1.append(f)
 
         acc = (np.array(y_true) == np.array(y_pred)).sum()
-        return acc / data_len, total_loss / data_len
+        f1_a = np.array(f1).reshape(-1, self.corpus.max_labels).mean(axis=0)
+        return acc / data_len, total_loss / data_len, f1_a
 
-    def train(self, train_data): # mudar o nome
+    def train(self, train_data, f1= None): # mudar o nome
         """
         Train and evaluate the model with training and validation data.
         """
@@ -144,9 +149,10 @@ class Trainer(object):
                 self.optimizer.step()
                 # evaluate on both training and test dataset
 
-            train_acc, train_loss = self.evaluate(self.train_data)
-            val_acc, val_loss = self.evaluate(self.validation_data)
-
+            train_acc, train_loss, f1_train = self.evaluate(self.train_data)
+            val_acc, val_loss, f1_val = self.evaluate(self.validation_data)
+            if f1 is not None:
+                f1.append(f1_val)
             if val_acc > best_acc:
                 # store the best result
                 best_acc = val_acc
@@ -156,8 +162,9 @@ class Trainer(object):
                 best_epoch = epoch
                 improved_str = '*'
                 torch.save(self.model.state_dict(), self.model_file)
-                torch.save(self.model.embedding.state_dict(), self.model_file+'.emb')
-                torch.save(self.model.convs.state_dict(), self.model_file + '.convs')
+                self.model.save([self.model_file+'.emb', self.model_file + '.convs'])
+                #torch.save(self.model.embedding.state_dict(), self.model_file+'.emb')
+                #torch.save(self.model.convs.state_dict(), self.model_file + '.convs')
             else:
                 improved_str = ''
 
@@ -167,14 +174,15 @@ class Trainer(object):
             if self.verbose:
                 print(msg.format(epoch + 1, train_loss, train_acc, val_loss, val_acc, time_dif, improved_str))
 
-            data = [epoch + 1, train_loss, train_acc, val_loss, val_acc]
+            data = [epoch + 1, train_loss, train_acc, val_loss, val_acc, f1_train.sum()/self.corpus.max_labels,
+                    f1_val.sum()/self.corpus.max_labels]
             ResultsHandler.write_train_row(self.config, data, self.file_config)
 
             train_data.append(data)
 
         if self.verbose:
-            print("Train Loss: {}".format(it_loss))
-
+            #print("Train Loss: {}".format(it_loss))
+            print("F1 final train: {} F1 final validation {}".format(f1_train, f1_val))
         #ResultsHandler.s_tensorboard(it_acc, it_loss, it_vacc, it_vloss,
                                     # [self.config.num_epochs, self.config.learning_rate])
 

@@ -22,8 +22,8 @@ class ResultsHandler(object):#TODO a+
         else:
             train_file = config_files.open_long_results_train_file()
             csvW = csv.writer(train_file, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-            csvW.writerow([config_model.num_epochs, config_model.learning_rate, data[0], data[1], data[2], 'train'])
-            csvW.writerow([config_model.num_epochs, config_model.learning_rate, data[0], data[3], data[4], 'test'])
+            csvW.writerow([config_model.num_epochs, config_model.learning_rate, data[0], data[1], data[2], data[5], 'train'])
+            csvW.writerow([config_model.num_epochs, config_model.learning_rate, data[0], data[3], data[4], data[6],'test'])
 
 
     @staticmethod
@@ -42,7 +42,7 @@ class ResultsHandler(object):#TODO a+
         csvW.writerow([config_model.num_epochs, config_model.learning_rate, data[0], data[1], data[2], data[3]])
     @staticmethod
     def simple_write(data, file):
-        f = open(file, mode='w+')
+        f = open(file, mode='a')
         csvW = csv.writer(f, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
         for r in data:
             csvW.writerow(r)
