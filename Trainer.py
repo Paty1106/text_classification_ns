@@ -97,7 +97,7 @@ class Trainer(object):
         data_len = len(data)
         total_loss = 0.0
         y_true, y_pred = [], []
-        f1 = []
+        
         for data, label in data_loader:
             data, label = torch.tensor(data), torch.tensor(label)
             if use_cuda:
@@ -112,12 +112,12 @@ class Trainer(object):
             pred = torch.max(output.data, dim=1)[1].cpu().numpy().tolist() #torch.max -> (value, index)
             y_pred.extend(pred)
             y_true.extend(label.data)
-            f = metrics.f1_score(y_true, y_pred, labels=task_labels, average=None)
-            f1.append(f)
+        f = metrics.f1_score(np.array(y_true).tolist(), y_pred, labels=task_labels, average=None)
+
 
         acc = (np.array(y_true) == np.array(y_pred)).sum()
-        f1_a = np.array(f1).reshape(-1, self.corpus.max_labels).mean(axis=0)
-        return acc / data_len, total_loss / data_len, f1_a
+        #f1_a = np.array(f1).reshape(-1, self.corpus.max_labels).mean(axis=0)
+        return acc / data_len, total_loss / data_len, f
 
     def train(self, train_data, f1= None): # mudar o nome
         """
