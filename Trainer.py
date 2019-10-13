@@ -111,12 +111,12 @@ class Trainer(object):
             total_loss += losses.item()
             pred = torch.max(output.data, dim=1)[1].cpu().numpy().tolist() #torch.max -> (value, index)
             y_pred.extend(pred)
-            y_true.extend(label.data)
-        f = metrics.f1_score(np.array(y_true).tolist(), y_pred, labels=task_labels, average=None)
+            y_true.extend(label.data.cpu().numpy().tolist())
+
+        f = metrics.f1_score(y_true, y_pred, labels=task_labels, average=None)
 
 
         acc = (np.array(y_true) == np.array(y_pred)).sum()
-        #f1_a = np.array(f1).reshape(-1, self.corpus.max_labels).mean(axis=0)
         return acc / data_len, total_loss / data_len, f
 
     def train(self, train_data, f1= None): # mudar o nome

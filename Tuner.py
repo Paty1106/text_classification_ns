@@ -11,36 +11,51 @@ import pandas
 
 class Tuner(object): #review class' name
 
-    def __init__(self, corpus, files_config, results_handler=None):
+    def __init__(self, corpus, files_config, results_handler=None, callback=None, args=None):
         self.corpus = corpus
         self.files_config = files_config
         self.files_handler = results_handler
+
+        self.model_callback = callback
+        self.model_args = args
+
         #TODO
 
     # epoch_limits: se freeze_epoch = False, então espera-se dois valores, cc, apenas o epoch_limits[0] precisa estar def.
     # lr_limits: =.
-    def random_search(self, execs, epoch_limits, lr_limits, freeze_lr=False, freeze_epochs=False):
+    def random_search(self, execs, epoch_limits, lr_limits, freeze_lr=False, freeze_epochs=False, rep=1):
 
         cnn_config = TCNNConfig(num_epochs=epoch_limits[0], learning_rate=lr_limits[0])
-
-    #tentar já gerar o vetor... depois so aplicar.
-        test_accs = []
+        lr_list = Tuner.lr_list(lr_limits)
         for e in range(execs):
-
             if not freeze_lr:
-                cnn_config.learning_rate = random.uniform(lr_limits[0], lr_limits[1])
+                cnn_config.learning_rate = lr_list[random.randint(0, len(lr_list) - 1)]
             if not freeze_epochs:
                 cnn_config.num_epochs = random.randint(epoch_limits[0], epoch_limits[1])
 
             print("LR{0} EP{1}\n".format(cnn_config.learning_rate, cnn_config.num_epochs))
+            res = []
+            train_data, f1, dp = [], [], []
+            for r in range(rep):
+                trainer = Trainer(corpus=self.corpus, config=cnn_config, file_config=self.files_config, verbose=False)
+                result = trainer.train(train_data, f1)
+                res.append(result[:4])
 
-            trainer = Trainer(corpus=self.corpus, config=cnn_config, file_config=self.files_config, verbose=False)
-            result = trainer.train()
-
-            test_accs.append(result[4])
-        # Other files
+            dt_frame = pandas.DataFrame(np.array(train_data)[:, :5],
+                                        columns=['epoch', 'train_loss', 'train_acc', 'val_loss', 'val_acc'])
+            cv_res = dt_frame.groupby('epoch').mean()
+            ncv = cv_res.to_numpy()
+            dp.append(np.std(res, axis=0))
+            # Other files
             ResultsHandler.write_result_resume_row(result, self.files_config, cnn_config)
-        ResultsHandler.write_test_acc(test_accs, self.files_config)
+            # Tensorboard
+            ResultsHandler.al_tensorboard(ncv, [cnn_config.num_epochs, cnn_config.learning_rate],
+                                          self.files_config.main_dir)
+            ResultsHandler.s_tensorboard(ncv, [cnn_config.num_epochs, cnn_config.learning_rate],
+                                         self.files_config.main_dir)
+            ResultsHandler.simple_write(dp, '{}/dp.csv'.format(self.files_config.result_path))
+            ResultsHandler.simple_write(f1, '{}/f1val.csv'.format(self.files_config.result_path))
+        #ResultsHandler.write_test_acc(test_accs, self.files_config)
 
     def random_search_cv(self, execs,  folds, epoch_limits, lr_limits, cv=1, freeze_lr=False, freeze_epochs=False):
         cnn_config = TCNNConfig(num_epochs=epoch_limits[0], learning_rate=lr_limits[0])
@@ -69,7 +84,11 @@ class Tuner(object): #review class' name
 
                     print(self.corpus.x_train.shape)
 
-                    t = Trainer(corpus=cf, model=None, config=cnn_config, file_config=self.files_config, verbose=True)
+                    if self.model_callback is not None:
+                        m = self.model_callback(self.model_args)
+                    else:
+                        m = None
+                    t = Trainer(corpus=cf, model=m, config=cnn_config, file_config=self.files_config, verbose=True)
                     r = t.train(train_data) #train_acc, train_loss, val_acc, val_loss, best_epoch
              #Average results
                     cv_result.append(r[:-1])

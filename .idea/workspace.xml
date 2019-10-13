@@ -3,7 +3,11 @@
   <component name="ChangeListManager">
     <list default="true" id="8821e6ad-b5d6-4e1e-9552-a3912ec48e29" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Main.py" beforeDir="false" afterPath="$PROJECT_DIR$/Main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TextCNN.py" beforeDir="false" afterPath="$PROJECT_DIR$/TextCNN.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Trainer.py" beforeDir="false" afterPath="$PROJECT_DIR$/Trainer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Tuner.py" beforeDir="false" afterPath="$PROJECT_DIR$/Tuner.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/exp.py" beforeDir="false" afterPath="$PROJECT_DIR$/exp.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -83,6 +87,27 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="Unnamed" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="tcc" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="true" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="split_dataset (1)" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="tcc" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -146,6 +171,14 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <list>
+      <item itemvalue="Python.Unnamed" />
+      <item itemvalue="Python.tests_graphs" />
+      <item itemvalue="Python.CorpusTH" />
+      <item itemvalue="Python.Main" />
+      <item itemvalue="Python.split_dataset (1)" />
+      <item itemvalue="Python.testTensorboard" />
+    </list>
     <recent_temporary>
       <list>
         <item itemvalue="Python.Main" />
@@ -216,7 +249,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Tuner.py</url>
-          <line>52</line>
+          <line>67</line>
           <option name="timeStamp" value="86" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -226,7 +259,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Trainer.py</url>
-          <line>114</line>
+          <line>115</line>
           <option name="timeStamp" value="112" />
         </line-breakpoint>
       </breakpoints>

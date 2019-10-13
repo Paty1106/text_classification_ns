@@ -92,5 +92,3 @@ class TCNNConfig(object): #TODO - pegar automaticamente alguns param?
 
     def __str__(self):
         pass #TODO
-    def print(self):
-        print("something") # TODO
