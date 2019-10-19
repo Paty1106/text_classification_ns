@@ -3,11 +3,15 @@
   <component name="ChangeListManager">
     <list default="true" id="8821e6ad-b5d6-4e1e-9552-a3912ec48e29" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CorpusHelper.py" beforeDir="false" afterPath="$PROJECT_DIR$/CorpusHelper.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CorpusTE.py" beforeDir="false" afterPath="$PROJECT_DIR$/CorpusTE.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Main.py" beforeDir="false" afterPath="$PROJECT_DIR$/Main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/TextCNN.py" beforeDir="false" afterPath="$PROJECT_DIR$/TextCNN.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ResultsHandler.py" beforeDir="false" afterPath="$PROJECT_DIR$/ResultsHandler.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Trainer.py" beforeDir="false" afterPath="$PROJECT_DIR$/Trainer.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Tuner.py" beforeDir="false" afterPath="$PROJECT_DIR$/Tuner.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/exp.py" beforeDir="false" afterPath="$PROJECT_DIR$/exp.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/hashtags.label" beforeDir="false" afterPath="$PROJECT_DIR$/hashtags.label" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -218,48 +222,23 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/ResultsHandler.py</url>
-          <line>55</line>
-          <option name="timeStamp" value="65" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/ResultsHandler.py</url>
-          <line>52</line>
-          <option name="timeStamp" value="66" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/tests.py</url>
-          <line>65</line>
+          <line>66</line>
           <option name="timeStamp" value="69" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/tests.py</url>
-          <line>74</line>
+          <line>75</line>
           <option name="timeStamp" value="70" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/tests.py</url>
-          <line>122</line>
+          <line>123</line>
           <option name="timeStamp" value="78" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/CorpusTE.py</url>
-          <line>65</line>
-          <option name="timeStamp" value="85" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Tuner.py</url>
-          <line>67</line>
-          <option name="timeStamp" value="86" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Trainer.py</url>
-          <line>84</line>
-          <option name="timeStamp" value="110" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Trainer.py</url>
-          <line>115</line>
+          <line>114</line>
           <option name="timeStamp" value="112" />
         </line-breakpoint>
       </breakpoints>

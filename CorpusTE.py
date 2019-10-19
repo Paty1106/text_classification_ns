@@ -74,20 +74,16 @@ class CorpusTE(Corpus):
         x = np.append(pos, neg, axis=0)
         y = np.append(pos_y, neg_y, axis=0)
 
+        #Shuffle train
         super().shuffle(x, y, dev_split=None, train_split=1)
 
-        if self.y_test is not None:
+        if self.y_test is not None:#rever
             self.y_test = self.y_test[:len(y)]
             self.x_test = self.x_test[:len(y), :]
         if self.y_validation is not None:
-            #print(self.x_validation.shape)
             self.y_validation = self.y_validation[:int(len(y)/2)]
             self.x_validation = self.x_validation[:int(len(y)/2), :]
 
-       # print("train shape")
-        #print(self.x_train.shape)
-        #print("validation shape")
-        #print(self.x_validation.shape)
 
 
 

@@ -122,6 +122,14 @@ class Corpus(object):
             self.x_test = x_data[num_train + num_validation:]
             self.y_test = y_data[num_train + num_validation:]
 
+    def join(self):#TO REMOVE
+
+        x = np.append(self.x_train, self.x_validation, axis=0)
+        y = np.append(self.y_train, self.y_validation)
+
+        x = np.append(x, self.x_test, axis=0)
+        y = np.append(y, self.y_test)
+        return x, y
 
     def __str__(self):
         test_size = 0 if self.x_test is None else self.x_test

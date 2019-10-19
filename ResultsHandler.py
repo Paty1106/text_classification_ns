@@ -8,8 +8,8 @@ import csv
 from torch.utils.tensorboard import SummaryWriter
 import tensorflow as tf
 import datetime
+import numpy as np
 class ResultsHandler(object):#TODO a+
-
 
     # Escreve uma linha por vez dos resultados do treinamento.
     # CONFIG é o objeto que carrega as informações do modelo.
@@ -75,6 +75,22 @@ class ResultsHandler(object):#TODO a+
         i = 1
         for d in dt:
             w.add_scalars('validation/loss-acc', {'loss': d[2], 'acc': d[3]}, i)
+            i += 1
+        w.close()
+
+    @staticmethod
+    def fscore_tensorboard(dt, c_data, folder=None, t='', type='fscore'):  # [e,lr]
+
+        s = "fscore.epc{}lr{}".format(c_data[0], c_data[1])
+        current_time = datetime.datetime.now().strftime("%d%m%Y-%H%M%S")
+        log_dirf = folder + '/' + t + s + type
+        w = SummaryWriter(log_dir=log_dirf, comment=s)
+        i = 1
+        s = dt.shape[1]
+        dt_classes = [str(x) for x in range(s)]
+        for d in dt:
+            f = dict(zip(dt_classes, d))
+            w.add_scalars('fscore_class', f, i)
             i += 1
         w.close()
 

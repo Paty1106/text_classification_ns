@@ -119,7 +119,7 @@ class Trainer(object):
         acc = (np.array(y_true) == np.array(y_pred)).sum()
         return acc / data_len, total_loss / data_len, f
 
-    def train(self, train_data, f1= None): # mudar o nome
+    def train(self, train_data, f1=None): # mudar o nome
         """
         Train and evaluate the model with training and validation data.
         """
@@ -152,7 +152,8 @@ class Trainer(object):
             train_acc, train_loss, f1_train = self.evaluate(self.train_data)
             val_acc, val_loss, f1_val = self.evaluate(self.validation_data)
             if f1 is not None:
-                f1.append(f1_val)
+                f1.append([f1_val[0], f1_val[1], epoch, 1])
+                f1.append([f1_train[0], f1_train[1], epoch, 0])
             if val_acc > best_acc:
                 # store the best result
                 best_acc = val_acc

@@ -31,9 +31,9 @@ def supernatural_lltrain():
             '../experiments/1labelthashtag.2019-10-12/checkpoints/model12102019-212240epc200lr0.0001.convs']
 
     tuner = Tuner(c, file_config, callback=model_load, args=args)
-    epochs = (3, 0)
+    epochs = (50, 0)
     lrs = (1e-5, 1e-1)
-    tuner.random_search_cv(execs=2, epoch_limits=epochs, lr_limits=lrs, cv=2, folds=f, freeze_epochs=True,
+    tuner.random_search_cv(execs=6, epoch_limits=epochs, lr_limits=lrs, cv=10, folds=f, freeze_epochs=True,
                              freeze_lr=False)
     print("RS finished!\n")
 

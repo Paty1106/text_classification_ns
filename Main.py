@@ -3,13 +3,14 @@ import tests
 import exp
 if __name__ == '__main__':
     #exp
-    exp.supernatural_lltrain()
+    #exp.supernatural_lltrain()
     #exp.rs_1labelthashtag()
     #exp.pre_1khashtags_rs()
     #exp.supernatural_rs()
     #exp.pre_rs_supernatural()
 
     #tests
+    tests.cv_rsplit()
     #tests.train_cv()
     #tests.test_load()
     #tests.test_loads()

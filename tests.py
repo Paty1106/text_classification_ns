@@ -5,6 +5,7 @@ from KFold import KFold
 from Tuner import *
 
 
+
 def test_cnn_th():
     cnn_config = TCNNConfig()
     cnn_config.num_epochs = 10
@@ -126,8 +127,8 @@ def test_tuner_1KHashtags():
 
     cnn_config = TCNNConfig()
     cnn_config.num_epochs = 4
-    file_config = FilesConfig(vocab_file='twitterhashtags.vocab', dataset_file='DataSetsEraldo/dataSetBahia.txt')
-    corpus = TwitterHashtagCorpus(file_config.train_file) # arrumar parametros
+    file_config = FilesConfig(vocab_file='twitter_hashtag/twitterhashtags.vocab', dataset_file='twitter_hashtag/out.txt')
+    corpus = TwitterHashtagCorpus(train_file=file_config.train_file, vocab_file=file_config.vocab_file) # arrumar parametros
 
     myTuner = Tuner(corpus, file_config)
     epochs = (10, 30)
@@ -218,4 +219,22 @@ def train_cv():
         ultimos_r.append(t.train(dt))
 
     print(ultimos_r)
+    print(':)')
+
+def cv_rsplit():
+
+    file_config = FilesConfig(vocab_file='twitter_hashtag/twitterhashtags.vocab',
+                              dataset_file='DataSetsEraldo/dataSetSupernatural.txt', task='supernatural')
+    c = CorpusTE(train_file='DataSetsEraldo/dataSetSupernatural.txt',
+                 vocab_file='twitter_hashtag/twitterhashtags.vocab')
+    x, y = c.prepare()
+    print(c.size)
+    f = RandomSplit(corpus=c, n=5, sub=350)
+    f.x = x
+    f.y = y
+
+    t = Tuner(c, file_config)
+    epochs = (5, 6)
+    lrs = (1e-4, 1e-2)
+    t.random_search_rsplit(1, f, epochs, lrs, freeze_epochs=True, freeze_lr=True)
     print(':)')
