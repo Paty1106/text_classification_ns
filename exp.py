@@ -24,17 +24,25 @@ def supernatural_lltrain():
     f.prepare_fold(x, y)
 
     cnn_config_s = TCNNConfig()
-    cnn_config_s.num_epochs = 4
+    cnn_config_s.num_epochs = 1
     cnn_config_s.num_classes = 2
 
     args = [cnn_config_s, '../experiments/1labelthashtag.2019-10-12/checkpoints/model12102019-212240epc200lr0.0001.emb',
             '../experiments/1labelthashtag.2019-10-12/checkpoints/model12102019-212240epc200lr0.0001.convs']
 
     tuner = Tuner(c, file_config, callback=model_load, args=args)
-    epochs = (50, 0)
+
+    epochs = (200, 0)
     lrs = (1e-5, 1e-1)
-    tuner.random_search_cv(execs=6, epoch_limits=epochs, lr_limits=lrs, cv=10, folds=f, freeze_epochs=True,
-                             freeze_lr=False)
+    tuner.random_search_cv(execs=1, epoch_limits=epochs, lr_limits=lrs, cv=10, folds=f, freeze_epochs=True,
+                             freeze_lr=True)
+    lrs = (1e-4, 1e-1)
+    tuner.random_search_cv(execs=1, epoch_limits=epochs, lr_limits=lrs, cv=10, folds=f, freeze_epochs=True,
+                           freeze_lr=True)
+    lrs = (1e-3, 1e-1)
+    tuner.random_search_cv(execs=1, epoch_limits=epochs, lr_limits=lrs, cv=10, folds=f, freeze_epochs=True,
+                           freeze_lr=True)
+
     print("RS finished!\n")
 
 
