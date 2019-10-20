@@ -3,6 +3,8 @@ import tests
 import exp
 if __name__ == '__main__':
     #exp
+    exp.rs_1khashtags()
+    exp.rs_rsplit_supernatural()
     #exp.supernatural_lltrain()
     #exp.rs_1labelthashtag()
     #exp.pre_1khashtags_rs()
@@ -10,7 +12,8 @@ if __name__ == '__main__':
     #exp.pre_rs_supernatural()
 
     #tests
-    tests.cv_rsplit()
+    #tests.test_new_multihashtags()
+    #tests.cv_rsplit()
     #tests.train_cv()
     #tests.test_load()
     #tests.test_loads()

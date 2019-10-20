@@ -127,11 +127,12 @@ def test_tuner_1KHashtags():
 
     cnn_config = TCNNConfig()
     cnn_config.num_epochs = 4
-    file_config = FilesConfig(vocab_file='twitter_hashtag/twitterhashtags.vocab', dataset_file='twitter_hashtag/out.txt')
+    file_config = FilesConfig(vocab_file='twitter_hashtag/twitterhashtags.vocab', dataset_file='twitter_hashtag/multiple.txt',
+                              task='1khashtags')
     corpus = TwitterHashtagCorpus(train_file=file_config.train_file, vocab_file=file_config.vocab_file) # arrumar parametros
 
     myTuner = Tuner(corpus, file_config)
-    epochs = (10, 30)
+    epochs = (5, 6)
     lrs = (0.0001, 0.01)
     myTuner.random_search(5, epochs, lrs, freeze_lr=True)
     print("RS finished!\n")
@@ -238,3 +239,24 @@ def cv_rsplit():
     lrs = (1e-4, 1e-2)
     t.random_search_rsplit(1, f, epochs, lrs, freeze_epochs=True, freeze_lr=True)
     print(':)')
+
+
+def test_new_multihashtags():
+    file_config = FilesConfig(vocab_file='twitterhashtags.vocab', dataset_file='multiple.txt', base_dir='twitter_hashtag',
+                              task='1labelthashtag')
+    c = TwitterHashtagCorpus(train_file=file_config.train_file, vocab_file=file_config.vocab_file)
+
+    #x = np.append(c.x_train, c.x_validation, axis=0)
+
+    y = np.append(c.y_train, c.y_validation)
+    ones = np.ones_like(y)
+
+    dt = pandas.DataFrame(y, columns=['class'])
+    dt.insert(1, 'c', ones)
+    x = dt.groupby('class').sum()
+    print(x)
+
+
+
+
+

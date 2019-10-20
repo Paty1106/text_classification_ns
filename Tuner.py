@@ -135,7 +135,7 @@ class Tuner(object): #review class' name
                     else:
                         m = None
                     t = Trainer(corpus=c, model=m, config=cnn_config, file_config=self.files_config,
-                                verbose=True)
+                                verbose=False)
                     r = t.train(train_data, f1)  # train_acc, train_loss, val_acc, val_loss, best_epoch
 
                     cv_result.append(r[:-1])

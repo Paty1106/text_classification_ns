@@ -70,4 +70,5 @@ class FilesConfig(object):
     def generate_name(self, dt_name):
         name = '../experiments/{}.{}'.format(dt_name, date.today())
         return name
+    
     #TODO close files..

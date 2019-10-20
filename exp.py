@@ -213,3 +213,30 @@ def rs_1labelthashtag():
     lrs = (1e-4, 1e-2)
     myTuner.random_search(execs=3, epoch_limits=epochs, lr_limits=lrs, freeze_epochs=True, rep=5)
 
+
+def rs_1khashtags():
+    file_config = FilesConfig(vocab_file='twitterhashtags.vocab', dataset_file='multiple.txt',
+                              base_dir='twitter_hashtag', task='1kthashtag')
+    c = TwitterHashtagCorpus(train_file=file_config.train_file, vocab_file=file_config.vocab_file)
+    epochs = (200, 6)
+    lrs = (1e-4, 1e-2)
+    t = Tuner(c, file_config)
+    t.random_search(5, epochs, lrs, freeze_epochs=True)
+    print('Done 1khashtag.')
+
+def rs_rsplit_supernatural():
+    file_config = FilesConfig(vocab_file='twitter_hashtag/twitterhashtags.vocab',
+                              dataset_file='DataSetsEraldo/dataSetSupernatural.txt', task='supernatural')
+    c = CorpusTE(train_file='DataSetsEraldo/dataSetSupernatural.txt',
+                 vocab_file='twitter_hashtag/twitterhashtags.vocab')
+    x, y = c.prepare()
+    print(c.size)
+    f = RandomSplit(corpus=c, n=5, sub=350)
+    f.x = x
+    f.y = y
+
+    t = Tuner(c, file_config)
+    epochs = (5, 6)
+    lrs = (1e-4, 1e-2)
+    t.random_search_rsplit(5, f, epochs, lrs, freeze_epochs=True, freeze_lr=True)
+    print('Done supernatural.')

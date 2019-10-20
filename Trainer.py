@@ -96,6 +96,7 @@ class Trainer(object):
 
         data_len = len(data)
         total_loss = 0.0
+
         y_true, y_pred = [], []
         
         for data, label in data_loader:
