@@ -15,7 +15,7 @@ def model_load(args):   #return a model
 
 def supernatural_lltrain():
     file_config = FilesConfig(vocab_file='twitter_hashtag/twitterhashtags.vocab',
-                              dataset_file='twitter_hashtag/out.txt', task='llsupernatural')
+                              dataset_file='twitter_hashtag/out.txt', task='10llsupernatural')
     c = CorpusTE(train_file='DataSetsEraldo/dataSetSupernatural.txt',
                  vocab_file='twitter_hashtag/twitterhashtags.vocab')
     x, y = c.prepare()
@@ -26,18 +26,18 @@ def supernatural_lltrain():
     cnn_config_s = TCNNConfig()
     cnn_config_s.num_classes = 2
 
-    args = [cnn_config_s, '../experiments/1kthashtag.2019-10-12/checkpoints/model21102019-211333epc200lr0.0001.emb',
-            '../experiments/1kthashtag.2019-10-12/checkpoints/model21102019-211333epc200lr0.0001.convs']
+    args = [cnn_config_s, '../experiments/1kthashtag.2019-10-21/checkpoints/model21102019-211333epc200lr0.0001.emb',
+            '../experiments/1kthashtag.2019-10-21/checkpoints/model21102019-211333epc200lr0.0001.convs']
 
     f = RandomSplit(corpus=c, n=10, sub=350)
     f.x = x
     f.y = y
 
     t = Tuner(c, file_config, callback=model_load, args=args, rand=False)
-    epochs = (100, 6)
+    epochs = (5, 6)
     lrs = (1e-5, 1e-2)
     t.random_search_rsplit(execs=4, rsplits=f, epoch_limits=epochs, lr_limits=lrs,
-                           freeze_epochs=True, freeze_lr=False)
+                           freeze_epochs=True, freeze_lr=False, r=10)
 
     print("RS finished!\n")
 

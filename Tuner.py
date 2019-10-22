@@ -149,43 +149,43 @@ class Tuner(object): #review class' name
                     result = t.train(train_data, f1)  # train_acc, train_loss, val_acc, val_loss, best_epoch
 
                     cv_result.append(result[:-1])
-                #Average - Results
-                cv_r = np.array(cv_result)
-                dp.append(np.std(cv_r, axis=0))  # TODO REVER
-                av_cv_r = np.average(cv_r, axis=0)
-                dt_frame = pandas.DataFrame(np.array(train_data)[:, :5],
+            #Average - Results
+            cv_r = np.array(cv_result)
+            dp.append(np.std(cv_r, axis=0))  # TODO REVER
+            av_cv_r = np.average(cv_r, axis=0)
+            dt_frame = pandas.DataFrame(np.array(train_data)[:, :5],
                                             columns=['epoch', 'train_loss', 'train_acc', 'val_loss', 'val_acc'])
-                cv_res_byepoch = dt_frame.groupby('epoch').mean()
-                ncv = cv_res_byepoch.to_numpy()
+            cv_res_byepoch = dt_frame.groupby('epoch').mean()
+            ncv = cv_res_byepoch.to_numpy()
 
 
 
 
-                dt_frame_fscore = pandas.DataFrame(np.array(f1),
+            dt_frame_fscore = pandas.DataFrame(np.array(f1),
                                             columns=['0', '1', 'epoch', 'train/val']) #Arrumar
-                mask_t = dt_frame_fscore["train/val"] == 0.0
-                mask_v = dt_frame_fscore["train/val"] == 1.0
+            mask_t = dt_frame_fscore["train/val"] == 0.0
+            mask_v = dt_frame_fscore["train/val"] == 1.0
 
-                train_dtframe = dt_frame_fscore[mask_t]
-                train_byepoch = train_dtframe.groupby('epoch').mean()
-                fscore_train = train_byepoch.to_numpy()[:, :-1]
+            train_dtframe = dt_frame_fscore[mask_t]
+            train_byepoch = train_dtframe.groupby('epoch').mean()
+            fscore_train = train_byepoch.to_numpy()[:, :-1]
 
-                val_dtframe = dt_frame_fscore[mask_v]
-                val_byepoch = val_dtframe.groupby('epoch').mean()
-                fscore_val = val_byepoch.to_numpy()[:, :-1]
+            val_dtframe = dt_frame_fscore[mask_v]
+            val_byepoch = val_dtframe.groupby('epoch').mean()
+            fscore_val = val_byepoch.to_numpy()[:, :-1]
 
 
 
                 #TODO- repeticoes
 
                 # Tensorboard
-                ResultsHandler.al_tensorboard(ncv, [cnn_config.num_epochs, cnn_config.learning_rate],
+            ResultsHandler.al_tensorboard(ncv, [cnn_config.num_epochs, cnn_config.learning_rate],
                                               self.files_config.main_dir)
-                ResultsHandler.s_tensorboard(ncv, [cnn_config.num_epochs, cnn_config.learning_rate],
+            ResultsHandler.s_tensorboard(ncv, [cnn_config.num_epochs, cnn_config.learning_rate],
                                              self.files_config.main_dir)
-                ResultsHandler.fscore_tensorboard(fscore_val, [cnn_config.num_epochs, cnn_config.learning_rate],
+            ResultsHandler.fscore_tensorboard(fscore_val, [cnn_config.num_epochs, cnn_config.learning_rate],
                                              self.files_config.main_dir, t='val', type='validation')
-                ResultsHandler.fscore_tensorboard(fscore_train, [cnn_config.num_epochs, cnn_config.learning_rate],
+            ResultsHandler.fscore_tensorboard(fscore_train, [cnn_config.num_epochs, cnn_config.learning_rate],
                                                   self.files_config.main_dir, t='train', type='train')
             # Other files
             ResultsHandler.write_result_resume_row(av_cv_r, self.files_config, cnn_config)
