@@ -1,7 +1,7 @@
 
 
 class RandomSplit(object):
-    def __init__(self, corpus, n, splits=[0.7, 0.3, 0.0], sub=0):
+    def __init__(self, corpus, n, splits=[0.7, 0.3, 0.0], sub=0, keep_prop=False):
         self.corpus = corpus
         self.n = n
         self.train_split = splits[0]
@@ -10,6 +10,7 @@ class RandomSplit(object):
         self.x = None
         self.y = None
         self.sampling = sub
+        self.keep_proportion = keep_prop
         self.i = 0
 
     def __iter__(self):
@@ -38,16 +39,17 @@ class RandomSplit(object):
     def sub_sampling(self):
         self.corpus.sub_sampling(self.sampling)
 
-        #Keep the same split of the original split
-        train_dim = len(self.corpus.y_train)
-        val_dim = int((train_dim * self.val_split)/self.train_split)
-        test_dim = int((train_dim * self.test_split)/self.train_split)
+        if self.keep_proportion:
+            # Keep the same split of data after sub-sampling
+            train_dim = len(self.corpus.y_train)
+            val_dim = int((train_dim * self.val_split) / self.train_split)
+            test_dim = int((train_dim * self.test_split) / self.train_split)
 
-        self.corpus.x_validation = self.corpus.x_validation[:val_dim, :]
-        self.corpus.y_validation = self.corpus.y_validation[:val_dim]
+            self.corpus.x_validation = self.corpus.x_validation[:val_dim, :]
+            self.corpus.y_validation = self.corpus.y_validation[:val_dim]
 
-        self.corpus.x_test = self.corpus.x_test[:test_dim, :]
-        self.corpus.y_test = self.corpus.y_test[:test_dim]
+            self.corpus.x_test = self.corpus.x_test[:test_dim, :]
+            self.corpus.y_test = self.corpus.y_test[:test_dim]
 
 
 

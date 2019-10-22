@@ -222,8 +222,8 @@ def train_cv():
     print(ultimos_r)
     print(':)')
 
-def cv_rsplit():
 
+def cv_rsplit():
     file_config = FilesConfig(vocab_file='twitter_hashtag/twitterhashtags.vocab',
                               dataset_file='DataSetsEraldo/dataSetSupernatural.txt', task='supernatural')
     c = CorpusTE(train_file='DataSetsEraldo/dataSetSupernatural.txt',
@@ -237,7 +237,7 @@ def cv_rsplit():
     t = Tuner(c, file_config)
     epochs = (5, 6)
     lrs = (1e-4, 1e-2)
-    t.random_search_rsplit(1, f, epochs, lrs, freeze_epochs=True, freeze_lr=True)
+    t.random_search_rsplit(2, f, epochs, lrs, freeze_epochs=True, freeze_lr=True)
     print(':)')
 
 

@@ -24,6 +24,11 @@ class ResultsHandler(object):#TODO a+
             csvW = csv.writer(train_file, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
             csvW.writerow([config_model.num_epochs, config_model.learning_rate, data[0], data[1], data[2], data[5], 'train'])
             csvW.writerow([config_model.num_epochs, config_model.learning_rate, data[0], data[3], data[4], data[6],'test'])
+    @staticmethod
+    def write_row(data, fl):
+        f = open(fl, mode='a+')
+        csvW = csv.writer(f, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+        csvW.writerow(data)
 
 
     @staticmethod

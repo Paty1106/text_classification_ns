@@ -136,9 +136,9 @@ class Tuner(object): #review class' name
                         m = None
                     t = Trainer(corpus=c, model=m, config=cnn_config, file_config=self.files_config,
                                 verbose=False)
-                    r = t.train(train_data, f1)  # train_acc, train_loss, val_acc, val_loss, best_epoch
+                    result = t.train(train_data, f1)  # train_acc, train_loss, val_acc, val_loss, best_epoch
 
-                    cv_result.append(r[:-1])
+                    cv_result.append(result[:-1])
                 #Average - Results
                 cv_r = np.array(cv_result)
                 dp.append(np.std(cv_r, axis=0))  # TODO REVER
@@ -174,7 +174,7 @@ class Tuner(object): #review class' name
                 ResultsHandler.s_tensorboard(ncv, [cnn_config.num_epochs, cnn_config.learning_rate],
                                              self.files_config.main_dir)
                 ResultsHandler.fscore_tensorboard(fscore_val, [cnn_config.num_epochs, cnn_config.learning_rate],
-                                             self.files_config.main_dir, t='val',type='validation')
+                                             self.files_config.main_dir, t='val', type='validation')
                 ResultsHandler.fscore_tensorboard(fscore_train, [cnn_config.num_epochs, cnn_config.learning_rate],
                                                   self.files_config.main_dir, t='train', type='train')
             # Other files

@@ -224,6 +224,7 @@ def rs_1khashtags():
     t.random_search(5, epochs, lrs, freeze_epochs=True)
     print('Done 1khashtag.')
 
+
 def rs_rsplit_supernatural():
     file_config = FilesConfig(vocab_file='twitter_hashtag/twitterhashtags.vocab',
                               dataset_file='DataSetsEraldo/dataSetSupernatural.txt', task='supernatural')
@@ -236,7 +237,8 @@ def rs_rsplit_supernatural():
     f.y = y
 
     t = Tuner(c, file_config)
-    epochs = (5, 6)
-    lrs = (1e-4, 1e-2)
-    t.random_search_rsplit(5, f, epochs, lrs, freeze_epochs=True, freeze_lr=True)
+    epochs = (100, 6)
+    lrs = (1e-3, 1e-2)
+    t.random_search_rsplit(execs=1, rsplits=f, epoch_limits=epochs, lr_limits=lrs,
+                           freeze_epochs=True, freeze_lr=True)
     print('Done supernatural.')

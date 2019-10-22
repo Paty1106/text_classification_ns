@@ -27,7 +27,7 @@ from sklearn import metrics
 from CorpusHelper import *
 from CorpusTwitterHashtag import TwitterHashtagCorpus
 
-
+from tqdm import tqdm
 import time
 import datetime
 from TextCNN import *
@@ -47,14 +47,19 @@ class Trainer(object):
             config = TCNNConfig()
 
         self.config = config
-        self.model_file = "{}{}epc{}lr{}".format(file_config.model_file, datetime.datetime.now().strftime("%d%m%Y-%H%M%S")
-                                                 , self.config.num_epochs, self.config.learning_rate)
+        self.model_file = "{}epc{}lr{}".format(datetime.datetime.now().strftime("%d%m%Y-%H%M%S")
+                                                 ,self.config.num_epochs, self.config.learning_rate)
         self.file_config = file_config
         if corpus is None:
             corpus = TwitterHashtagCorpus(file_config.train_file, file_config.vocab_file, self.config.dev_split,
                                           self.config.seq_length, self.config.vocab_size)
-        self.corpus = corpus
+    #DOING#####
+        self.file_config.model_file = '{}/{}'.format(self.file_config.save_path, self.model_file)
+        self.file_config.results_train ='{}/{}.epochs'.format(self.file_config.result_path, self.model_file)
+        self.file_config.results_train_file = None
+    ##########
 
+        self.corpus = corpus
         self.config.vocab_size = len(self.corpus.words)
         self.config.target_names = self.corpus.label_to_id.keys()
         self.config.num_classes = len(self.corpus.label_to_id)
@@ -115,15 +120,14 @@ class Trainer(object):
             y_true.extend(label.data.cpu().numpy().tolist())
 
         f = metrics.f1_score(y_true, y_pred, labels=task_labels, average=None)
-
-
         acc = (np.array(y_true) == np.array(y_pred)).sum()
+
         return acc / data_len, total_loss / data_len, f
 
+    """
+          Train and evaluate the model with training and validation data.
+    """
     def train(self, train_data, f1=None): # mudar o nome
-        """
-        Train and evaluate the model with training and validation data.
-        """
         print("Training and evaluating...")
         start_time = time.time()
         # set the mode to train
@@ -131,7 +135,7 @@ class Trainer(object):
         bt_acc = bt_loss = bv_loss = 0.0
         best_acc = 0.0
         best_epoch = 0
-        for epoch in range(self.config.num_epochs):
+        for epoch in tqdm(range(self.config.num_epochs)):
             # load the training data in batch
             self.model.train()
             train_loader = DataLoader(self.train_data, batch_size=self.config.batch_size)
@@ -152,7 +156,9 @@ class Trainer(object):
 
             train_acc, train_loss, f1_train = self.evaluate(self.train_data)
             val_acc, val_loss, f1_val = self.evaluate(self.validation_data)
+
             if f1 is not None:
+                ###testing##
                 f1.append([f1_val[0], f1_val[1], epoch, 1])
                 f1.append([f1_train[0], f1_train[1], epoch, 0])
             if val_acc > best_acc:
@@ -163,10 +169,9 @@ class Trainer(object):
                 bv_loss = val_loss
                 best_epoch = epoch
                 improved_str = '*'
-                torch.save(self.model.state_dict(), self.model_file)
-                self.model.save([self.model_file+'.emb', self.model_file + '.convs'])
-                #torch.save(self.model.embedding.state_dict(), self.model_file+'.emb')
-                #torch.save(self.model.convs.state_dict(), self.model_file + '.convs')
+                torch.save(self.model.state_dict(), self.file_config.model_file+'.all')
+                self.model.save([self.file_config.model_file+'.emb', self.file_config.model_file + '.convs'])
+
             else:
                 improved_str = ''
 
@@ -180,15 +185,15 @@ class Trainer(object):
                     f1_val.sum()/self.corpus.max_labels]
             ResultsHandler.write_train_row(self.config, data, self.file_config)
 
+            ###testing##
+            ResultsHandler.write_row(f1_train, '{}/{}.fscoretrain'.format(self.file_config.result_path, self.model_file))
+            ResultsHandler.write_row(f1_val, '{}/{}.fscoreval'.format(self.file_config.result_path, self.model_file))
+
             train_data.append(data)
 
         if self.verbose:
-            #print("Train Loss: {}".format(it_loss))
             print("F1 final train: {} F1 final validation {}".format(f1_train, f1_val))
-        #ResultsHandler.s_tensorboard(it_acc, it_loss, it_vacc, it_vloss,
-                                    # [self.config.num_epochs, self.config.learning_rate])
 
-       # return train_acc, train_loss, val_acc, val_loss, best_epoch #mudar pra best?
         return bt_acc, bt_loss, best_acc, bv_loss, best_epoch
 
     def test(self, test_data):

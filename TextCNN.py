@@ -87,7 +87,7 @@ class TCNNConfig(object): #TODO - pegar automaticamente alguns param?
 
     dev_split = 0.1  # percentage of dev data
 
-    cuda_device = 3  # cuda device to be used when available
+    cuda_device = 0  # cuda device to be used when available
 
 
     def __str__(self):

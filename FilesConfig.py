@@ -14,11 +14,11 @@ class FilesConfig(object):
         if not os.path.exists(self.main_dir):
             os.mkdir(self.main_dir)
 
-        save_path = os.path.join(self.main_dir, 'checkpoints') # model save path
+        self.save_path = os.path.join(self.main_dir, 'checkpoints') # model save path
 
-        if not os.path.exists(save_path):
-            os.mkdir(save_path)
-        self.model_file = os.path.join(save_path, model)#'hashtag_cnn_pytorch.pt'
+        if not os.path.exists(self.save_path):
+            os.mkdir(self.save_path)
+        self.model_file = os.path.join(self.save_path, model)#'hashtag_cnn_pytorch.pt'
 
         self.result_path = os.path.join(self.main_dir, result_dir)  # model save path
         if not os.path.exists(self.result_path):
@@ -70,5 +70,5 @@ class FilesConfig(object):
     def generate_name(self, dt_name):
         name = '../experiments/{}.{}'.format(dt_name, date.today())
         return name
-    
+
     #TODO close files..
