@@ -24,12 +24,12 @@ class ResultsHandler(object):#TODO a+
             csvW = csv.writer(train_file, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
             csvW.writerow([config_model.num_epochs, config_model.learning_rate, data[0], data[1], data[2], data[5], 'train'])
             csvW.writerow([config_model.num_epochs, config_model.learning_rate, data[0], data[3], data[4], data[6],'test'])
+
     @staticmethod
     def write_row(data, fl):
         f = open(fl, mode='a+')
         csvW = csv.writer(f, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
         csvW.writerow(data)
-
 
     @staticmethod
     def write_test_acc(data, config_files):
@@ -38,13 +38,13 @@ class ResultsHandler(object):#TODO a+
         for acc in data:
             csvW.writerow([acc])
 
-
     @staticmethod
     def write_result_resume_row(data, config_files, config_model):
         resume_file = config_files.open_resume_file()
         csvW = csv.writer(resume_file, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
        # csvW.writerow([config_model.num_epochs, config_model.learning_rate, data[0], data[1], data[2], data[3], data[4]])
         csvW.writerow([config_model.num_epochs, config_model.learning_rate, data[0], data[1], data[2], data[3]])
+
     @staticmethod
     def simple_write(data, file):
         f = open(file, mode='a')
@@ -79,7 +79,7 @@ class ResultsHandler(object):#TODO a+
         w = SummaryWriter(log_dir=log_dirf, comment=s)
         i = 1
         for d in dt:
-            w.add_scalars('validation/loss-acc', {'loss': d[2], 'acc': d[3]}, i)
+            w.add_scalars('l-a', {'loss': d[2], 'acc': d[3]}, i)
             i += 1
         w.close()
 

@@ -4,8 +4,8 @@ import exp
 if __name__ == '__main__':
     #exp
     #exp.rs_1khashtags()
-    exp.rs_rsplit_supernatural()
-    #exp.supernatural_lltrain()
+    #exp.rs_rsplit_supernatural()
+    exp.supernatural_lltrain()
     #exp.rs_1labelthashtag()
     #exp.pre_1khashtags_rs()
     #exp.supernatural_rs()

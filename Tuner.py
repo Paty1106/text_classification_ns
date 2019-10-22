@@ -8,7 +8,6 @@ from CorpusTE import *
 from KFold import *
 import pandas
 
-
 class Tuner(object): #review class' name
 
     def __init__(self, corpus, files_config, results_handler=None, callback=None, args=None, rand=True):
@@ -28,11 +27,16 @@ class Tuner(object): #review class' name
         cnn_config = TCNNConfig(num_epochs=epoch_limits[0], learning_rate=lr_limits[0])
         lr_list = Tuner.lr_list(lr_limits)
         for e in range(execs):
-            if not freeze_lr:
-                cnn_config.learning_rate = lr_list[random.randint(0, len(lr_list) - 1)]
-            if not freeze_epochs:
-                cnn_config.num_epochs = random.randint(epoch_limits[0], epoch_limits[1])
-
+            if self.rand:
+                if not freeze_lr:
+                    cnn_config.learning_rate = lr_list[random.randint(0, len(lr_list) - 1)]
+                if not freeze_epochs:
+                    cnn_config.num_epochs = random.randint(epoch_limits[0], epoch_limits[1])
+            else:
+                if not freeze_lr:
+                    cnn_config.learning_rate = lr_list[e]
+                if not freeze_epochs:
+                    cnn_config.num_epochs = random.randint(epoch_limits[0], epoch_limits[1])
             print("LR{0} EP{1}\n".format(cnn_config.learning_rate, cnn_config.num_epochs))
             res = []
             train_data, f1, dp = [], [], []

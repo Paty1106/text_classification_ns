@@ -34,7 +34,9 @@ class TextCNN(nn.Module):
         # Conv1d takes in (batch, channels, seq_len), but raw embedded is (batch, seq_len, channels)
         embedded = self.embedding(inputs).permute(0, 2, 1)
         x = [self.conv_and_max_pool(embedded, k) for k in self.convs]  # convolution and global max pooling
-        x = self.fc1(self.dropout(torch.cat(x, 1)))  # concatenation and dropout
+        x_cat = self.dropout(torch.cat(x, 1))
+        x = self.fc1(x_cat)
+        #x = self.fc1(self.dropout(torch.cat(x, 1)))  # concatenation and dropout
 
         return x
 

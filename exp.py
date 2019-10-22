@@ -15,7 +15,7 @@ def model_load(args):   #return a model
 
 def supernatural_lltrain():
     file_config = FilesConfig(vocab_file='twitter_hashtag/twitterhashtags.vocab',
-                              dataset_file='twitter_hashtag/out.txt', task='supernatural')
+                              dataset_file='twitter_hashtag/out.txt', task='llsupernatural')
     c = CorpusTE(train_file='DataSetsEraldo/dataSetSupernatural.txt',
                  vocab_file='twitter_hashtag/twitterhashtags.vocab')
     x, y = c.prepare()
@@ -24,24 +24,20 @@ def supernatural_lltrain():
     f.prepare_fold(x, y)
 
     cnn_config_s = TCNNConfig()
-    cnn_config_s.num_epochs = 1
     cnn_config_s.num_classes = 2
 
-    args = [cnn_config_s, '../experiments/1labelthashtag.2019-10-12/checkpoints/model12102019-212240epc200lr0.0001.emb',
-            '../experiments/1labelthashtag.2019-10-12/checkpoints/model12102019-212240epc200lr0.0001.convs']
+    args = [cnn_config_s, '../experiments/1kthashtag.2019-10-12/checkpoints/model21102019-211333epc200lr0.0001.emb',
+            '../experiments/1kthashtag.2019-10-12/checkpoints/model21102019-211333epc200lr0.0001.convs']
 
-    tuner = Tuner(c, file_config, callback=model_load, args=args)
+    f = RandomSplit(corpus=c, n=10, sub=350)
+    f.x = x
+    f.y = y
 
-    epochs = (200, 0)
-    lrs = (1e-5, 1e-1)
-    tuner.random_search_cv(execs=1, epoch_limits=epochs, lr_limits=lrs, cv=10, folds=f, freeze_epochs=True,
-                             freeze_lr=True)
-    lrs = (1e-4, 1e-1)
-    tuner.random_search_cv(execs=1, epoch_limits=epochs, lr_limits=lrs, cv=10, folds=f, freeze_epochs=True,
-                           freeze_lr=True)
-    lrs = (1e-3, 1e-1)
-    tuner.random_search_cv(execs=1, epoch_limits=epochs, lr_limits=lrs, cv=10, folds=f, freeze_epochs=True,
-                           freeze_lr=True)
+    t = Tuner(c, file_config, callback=model_load, args=args, rand=False)
+    epochs = (100, 6)
+    lrs = (1e-5, 1e-2)
+    t.random_search_rsplit(execs=4, rsplits=f, epoch_limits=epochs, lr_limits=lrs,
+                           freeze_epochs=True, freeze_lr=False)
 
     print("RS finished!\n")
 
@@ -219,9 +215,9 @@ def rs_1khashtags():
                               base_dir='twitter_hashtag', task='1kthashtag')
     c = TwitterHashtagCorpus(train_file=file_config.train_file, vocab_file=file_config.vocab_file)
     epochs = (200, 6)
-    lrs = (1e-4, 1e-2)
+    lrs = (1e-5, 1e-2)
     t = Tuner(c, file_config)
-    t.random_search(5, epochs, lrs, freeze_epochs=True)
+    t.random_search(4, epochs, lrs, freeze_epochs=True)
     print('Done 1khashtag.')
 
 
