@@ -54,7 +54,7 @@ class CorpusTE(Corpus):
             self.shuffle(x, y)
             pos = np.sum(self.y_train)
 
-    def sub_sampling(self, size):
+    def sub_sampling(self, size, val=False):
         #pega o num de exem da classe menos contemplada no cjt de treino, seleciona a mesma qtd
         #da outra classe e entao pega 2n exemplos do dev e test. um novo split de tamanho 2n é gerado
         n_mask = np.logical_not(np.array(self.y_train, dtype=bool))
@@ -76,13 +76,13 @@ class CorpusTE(Corpus):
 
         #Shuffle train
         super().shuffle(x, y, dev_split=None, train_split=1)
-
-        if self.y_test is not None:#rever
-            self.y_test = self.y_test[:len(y)]
-            self.x_test = self.x_test[:len(y), :]
-        if self.y_validation is not None:
-            self.y_validation = self.y_validation[:int(len(y)/2)]
-            self.x_validation = self.x_validation[:int(len(y)/2), :]
+        if val:
+            if self.y_test is not None:#rever
+                self.y_test = self.y_test[:len(y)]
+                self.x_test = self.x_test[:len(y), :]
+            if self.y_validation is not None:
+                self.y_validation = self.y_validation[:int(len(y)/2)]
+                self.x_validation = self.x_validation[:int(len(y)/2), :]
 
 
 

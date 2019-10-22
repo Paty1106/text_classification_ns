@@ -232,13 +232,13 @@ def rs_rsplit_supernatural():
                  vocab_file='twitter_hashtag/twitterhashtags.vocab')
     x, y = c.prepare()
     print(c.size)
-    f = RandomSplit(corpus=c, n=5, sub=350)
+    f = RandomSplit(corpus=c, n=10, sub=350)
     f.x = x
     f.y = y
 
-    t = Tuner(c, file_config)
+    t = Tuner(c, file_config, rand=False)
     epochs = (100, 6)
-    lrs = (1e-3, 1e-2)
-    t.random_search_rsplit(execs=1, rsplits=f, epoch_limits=epochs, lr_limits=lrs,
-                           freeze_epochs=True, freeze_lr=True)
+    lrs = (1e-5, 1e-2)
+    t.random_search_rsplit(execs=4, rsplits=f, epoch_limits=epochs, lr_limits=lrs,
+                           freeze_epochs=True, freeze_lr=False)
     print('Done supernatural.')

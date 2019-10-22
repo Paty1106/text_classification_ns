@@ -11,14 +11,14 @@ import pandas
 
 class Tuner(object): #review class' name
 
-    def __init__(self, corpus, files_config, results_handler=None, callback=None, args=None):
+    def __init__(self, corpus, files_config, results_handler=None, callback=None, args=None, rand=True):
         self.corpus = corpus
         self.files_config = files_config
         self.files_handler = results_handler
 
         self.model_callback = callback
         self.model_args = args
-
+        self.rand = rand
         #TODO
 
     # epoch_limits: se freeze_epoch = False, então espera-se dois valores, cc, apenas o epoch_limits[0] precisa estar def.
@@ -113,11 +113,18 @@ class Tuner(object): #review class' name
         cv_result = []
         dp = []
         lr_list = Tuner.lr_list(lr_limits)
+
         for e in range(execs):
-            if not freeze_lr:
-                cnn_config.learning_rate = lr_list[random.randint(0, len(lr_list) - 1)]
-            if not freeze_epochs:
-                cnn_config.num_epochs = random.randint(epoch_limits[0], epoch_limits[1])
+            if self.rand:
+                if not freeze_lr:
+                    cnn_config.learning_rate = lr_list[random.randint(0, len(lr_list) - 1)]
+                if not freeze_epochs:
+                    cnn_config.num_epochs = random.randint(epoch_limits[0], epoch_limits[1])
+            else:
+                if not freeze_lr:
+                    cnn_config.learning_rate = lr_list[e]
+                if not freeze_epochs:
+                    cnn_config.num_epochs = random.randint(epoch_limits[0], epoch_limits[1])
 
             print("LR{0} EP{1}\n".format(cnn_config.learning_rate, cnn_config.num_epochs))
 
@@ -126,9 +133,8 @@ class Tuner(object): #review class' name
             for i in range(r):  #est.
                 for c in rsplits:
 
-                    print('DISTRIBUTION')
-                    print(self.corpus.train_distribution())
-                    print(self.corpus.x_train.shape)
+                    #print('DISTRIBUTION')
+                    #print(self.corpus.train_distribution())
 
                     if self.model_callback is not None:
                         m = self.model_callback(self.model_args)
