@@ -13,7 +13,7 @@ if __name__ == '__main__':
 
     #tests
     #tests.test_new_multihashtags()
-    tests.cv_rsplit()
+    #tests.cv_rsplit()
     #tests.train_cv()
     #tests.test_load()
     #tests.test_loads()
