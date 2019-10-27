@@ -226,6 +226,8 @@ def rs_1khashtags():
 def time_cons():
     cnn_config = TCNNConfig()
     cnn_config.batch_size = 200
+    cnn_config.num_epochs = 50
+    cnn_config.learning_rate = 1e-3
     emb = tests.load_embedding('twitter_hashtag/1kthashtag.glove')
 
     file_config = FilesConfig(vocab_file='twitter_hashtag/1kthashtag.vocab', dataset_file='twitter_hashtag/multiple.txt',
