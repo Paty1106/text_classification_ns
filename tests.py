@@ -281,7 +281,7 @@ def my_model(args):
 
     return ETextCNN(config=args[0], pre_trained_emb=args[1])
 def test_pretrained_emb():
-    embedding = load_embedding('../helpers/1kthashtag.glove')
+    embedding = load_embedding('twitter_hashtag/1kthashtag.glove')
     file_config = FilesConfig(vocab_file='../helpers/1kthashtag.vocab',
                               dataset_file='DataSetsEraldo/dataSetSupernatural.txt', task='supernatural')
     c = CorpusTE(train_file='DataSetsEraldo/dataSetSupernatural.txt',

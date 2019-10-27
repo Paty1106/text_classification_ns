@@ -4,7 +4,7 @@ from CorpusTE import CorpusTE
 from KFold import KFold
 from Tuner import *
 import time
-
+import tests
 def model_load(args):   #return a model
 
     model_supernatural = TextCNN(config=args[0])
@@ -226,12 +226,18 @@ def rs_1khashtags():
 def time_cons():
     cnn_config = TCNNConfig()
     cnn_config.batch_size = 200
+    emb = tests.load_embedding('twitter_hashtag/1kthashtag.glove')
 
-    file_config = FilesConfig(vocab_file='../helpers/1kthashtag.vocab', dataset_file='twitter_hashtag/multiple.txt',
+    file_config = FilesConfig(vocab_file='twitter_hashtag/1kthashtag.vocab', dataset_file='twitter_hashtag/multiple.txt',
                               task='1khashtags')
     corpus = TwitterHashtagCorpus(train_file=file_config.train_file,
                                   vocab_file=file_config.vocab_file)  # arrumar parametros
-    trainer = Trainer(corpus=corpus, config=cnn_config, file_config=file_config, verbose=True)
+
+
+
+
+    cnn = TextCNN(config=cnn_config, pre_trained_emb=emb)
+    trainer = Trainer(corpus=corpus, model=cnn, config=cnn_config, file_config=file_config, verbose=True)
     train_data = []
 
     start_time = time.time()
@@ -241,7 +247,7 @@ def time_cons():
     r = datetime.timedelta(seconds=int(round(time_dif)))
     print(r)
     with open('tempo.txt', mode='w+') as x:
-        x.write(r)
+        x.write(str(r))
 
 def rs_rsplit_supernatural():
     file_config = FilesConfig(vocab_file='twitter_hashtag/twitterhashtags.vocab',
