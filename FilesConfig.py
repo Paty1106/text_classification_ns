@@ -68,7 +68,7 @@ class FilesConfig(object):
 
     #cria um nome a partir dos parametros passados.
     def generate_name(self, dt_name):
-        name = '../experiments/{}.{}'.format(dt_name, date.today())
+        name = '../tests_tcc/{}.{}'.format(dt_name, date.today())
         return name
 
     #TODO close files..

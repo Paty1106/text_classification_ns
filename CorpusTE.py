@@ -4,12 +4,12 @@ from CorpusHelper import *
 from torch import tensor
 import random
 
+
 class CorpusTE(Corpus):
     def __init__(self, train_file, vocab_file, dev_split=0.2, test_split=None, sent_max_length=50, vocab_size=8000):
         super().__init__()
         self.train_file = train_file
         self.vocab_file = vocab_file
-
         self.dev_split = dev_split
         self.test_split = test_split
         self.label_to_id = {'Nao': 0, 'Sim': 1}
@@ -29,6 +29,7 @@ class CorpusTE(Corpus):
                 y_data.append(ex_label) # Get just the first one hashtag
 
         self.words, self.word_id = CorpusHelper.read_vocab(self.vocab_file)
+        self.vocab_size = len(self.word_id)
 
         for i in range(len(x_data)):  # tokenizing and padding
             x_data[i] = CorpusHelper.process_text(x_data[i], self.word_id,
@@ -60,8 +61,8 @@ class CorpusTE(Corpus):
         n_mask = np.logical_not(np.array(self.y_train, dtype=bool))
         mask = np.array(self.y_train, dtype=bool)
 
-        pos = self.x_train[mask].reshape(-1, 50)#[:size]
-        neg = self.x_train[n_mask].reshape(-1, 50)#[: pos.shape[0]]
+        pos = self.x_train[mask].reshape(-1, self.sentence_size)#[:size]
+        neg = self.x_train[n_mask].reshape(-1, self.sentence_size)#[: pos.shape[0]]
 
         index_p = np.random.permutation(np.arange(pos.shape[0]))[:size]
         index_n = np.random.permutation(np.arange(neg.shape[0]))[:size]
@@ -84,10 +85,12 @@ class CorpusTE(Corpus):
                 self.y_validation = self.y_validation[:int(len(y)/2)]
                 self.x_validation = self.x_validation[:int(len(y)/2), :]
 
-
-
-
-
+    def __str__(self):
+        return 'Training: {},Validation{},Testing: {}, Vocabulary: {}. Sentence: {}'.format(len(self.x_train),
+                                                                                            len(self.x_validation),
+                                                                                            len(self.x_test),
+                                                                                            self.vocab_size,
+                                                                                            self.sentence_size)
 
     def prepare(self):
         return super().prepare(self.prepare_data)

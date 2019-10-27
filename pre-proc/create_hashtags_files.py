@@ -1,5 +1,6 @@
 from CorpusHelper import CorpusHelper
 
+
 def createhashtags_file(label_file, train_file):
     id = 0
     with CorpusHelper.open_file(train_file,'r') as inFile:

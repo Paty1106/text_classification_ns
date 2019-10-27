@@ -3,7 +3,7 @@ from CorpusTH import *
 from CorpusTE import CorpusTE
 from KFold import KFold
 from Tuner import *
-
+import time
 
 def model_load(args):   #return a model
 
@@ -220,6 +220,28 @@ def rs_1khashtags():
     t.random_search(4, epochs, lrs, freeze_epochs=True)
     print('Done 1khashtag.')
 
+
+
+
+def time_cons():
+    cnn_config = TCNNConfig()
+    cnn_config.batch_size = 200
+
+    file_config = FilesConfig(vocab_file='../helpers/1kthashtag.vocab', dataset_file='twitter_hashtag/multiple.txt',
+                              task='1khashtags')
+    corpus = TwitterHashtagCorpus(train_file=file_config.train_file,
+                                  vocab_file=file_config.vocab_file)  # arrumar parametros
+    trainer = Trainer(corpus=corpus, config=cnn_config, file_config=file_config, verbose=True)
+    train_data = []
+
+    start_time = time.time()
+    result = trainer.train(train_data)
+    end_time = time.time()
+    time_dif = end_time - start_time
+    r = datetime.timedelta(seconds=int(round(time_dif)))
+    print(r)
+    with open('tempo.txt', mode='w+') as x:
+        x.write(r)
 
 def rs_rsplit_supernatural():
     file_config = FilesConfig(vocab_file='twitter_hashtag/twitterhashtags.vocab',

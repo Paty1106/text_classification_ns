@@ -4,10 +4,10 @@ from CorpusHelper import *
 
 class TwitterHashtagCorpusMultilable(object):
 
-    def __init__(self, train_file, vocab_file, dev_split=0.1, sent_max_lenght=50, vocab_size=8000):
+    def __init__(self, train_file, vocab_file, dev_split=0.1, sent_max_lenght=40, vocab_size=8000):
         # loading data
         self.sent_max_lenght = sent_max_lenght
-        self.vacab_size = vocab_size
+
         with CorpusHelper.open_file(train_file) as f:
             x_data = []
             y_data = []
@@ -29,7 +29,7 @@ class TwitterHashtagCorpusMultilable(object):
             CorpusHelper.build_vocab(x_data, vocab_file, vocab_size)
 
         self.words, self.word_to_id = CorpusHelper.read_vocab(vocab_file)
-
+        self.vocab_size = len(self.word_to_id)
         for i in range(len(x_data)):  # tokenizing and padding
             x_data[i] = CorpusHelper.process_text(x_data[i], self.word_to_id, sent_max_lenght, clean=False)
 
@@ -100,7 +100,7 @@ class TwitterHashtagCorpus(object):
         self.dev_split = dev_split
         self.train_split = 0.7
         self.sent_max_length = sent_max_length
-        self.vocab_size = vocab_size
+
         with CorpusHelper.open_file(train_file) as f:
             x_data = []
             y_data = []
@@ -123,7 +123,7 @@ class TwitterHashtagCorpus(object):
             CorpusHelper.build_vocab(x_data, vocab_file, vocab_size)
 
         self.words, self.word_to_id = CorpusHelper.read_vocab(vocab_file)
-
+        self.vocab_size = len(self.word_to_id)
         for i in range(len(x_data)):  # tokenizing and padding
             x_data[i] = CorpusHelper.process_text(x_data[i], self.word_to_id, sent_max_length, clean=False)
 
@@ -151,7 +151,7 @@ class TwitterHashtagCorpus(object):
 
     def __str__(self):
         return 'Training: {},Validation{},Testing: {}, Vocabulary: {}'.format(len(self.x_train), len(self.x_validation),
-                                                                               len(self.x_test), len(self.words))
+                                                                               len(self.x_test), self.vocab_size)
 
     def shuffle(self, dev=None):
         if dev is None:

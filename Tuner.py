@@ -7,7 +7,7 @@ from RandomSplit import *
 from CorpusTE import *
 from KFold import *
 import pandas
-
+from TensorBoardHelper import TensorBoardHelper
 class Tuner(object): #review class' name
 
     def __init__(self, corpus, files_config, results_handler=None, callback=None, args=None, rand=True):
@@ -41,7 +41,7 @@ class Tuner(object): #review class' name
             res = []
             train_data, f1, dp = [], [], []
             for r in range(rep):
-                trainer = Trainer(corpus=self.corpus, config=cnn_config, file_config=self.files_config, verbose=False)
+                trainer = Trainer(corpus=self.corpus, config=cnn_config, file_config=self.files_config, verbose=True)
                 result = trainer.train(train_data, f1)
                 res.append(result[:4])
 
@@ -58,7 +58,12 @@ class Tuner(object): #review class' name
             ResultsHandler.s_tensorboard(ncv, [cnn_config.num_epochs, cnn_config.learning_rate],
                                          self.files_config.main_dir)
             ResultsHandler.simple_write(dp, '{}/dp.csv'.format(self.files_config.result_path))
-            ResultsHandler.simple_write(f1, '{}/f1val.csv'.format(self.files_config.result_path))
+           # ResultsHandler.simple_write(f1, '{}/f1val.csv'.format(self.files_config.result_path))
+
+            TensorBoardHelper.hparams(ncv, folder=self.files_config.main_dir + '/hparam_tuning',
+                                            hparams={'lr': cnn_config.learning_rate,
+                                                     'ep': cnn_config.num_epochs, 'num_filtros':cnn_config.num_filters, 'kernel1':cnn_config.kernel_sizes[0]}
+                                      , ex=cnn_config.learning_rate)
         #ResultsHandler.write_test_acc(test_accs, self.files_config)
 
     def random_search_cv(self, execs,  folds, epoch_limits, lr_limits, cv=1, freeze_lr=False, freeze_epochs=False):
@@ -114,11 +119,12 @@ class Tuner(object): #review class' name
 
     def random_search_rsplit(self, execs, rsplits, epoch_limits, lr_limits, r=1, freeze_lr=False, freeze_epochs=False):
         cnn_config = TCNNConfig(num_epochs=epoch_limits[0], learning_rate=lr_limits[0])
-        cv_result = []
+
         dp = []
         lr_list = Tuner.lr_list(lr_limits)
 
         for e in range(execs):
+            cv_result = []
             if self.rand:
                 if not freeze_lr:
                     cnn_config.learning_rate = lr_list[random.randint(0, len(lr_list) - 1)]
@@ -145,7 +151,7 @@ class Tuner(object): #review class' name
                     else:
                         m = None
                     t = Trainer(corpus=c, model=m, config=cnn_config, file_config=self.files_config,
-                                verbose=False)
+                                verbose=True, metric='f1-score')
                     result = t.train(train_data, f1)  # train_acc, train_loss, val_acc, val_loss, best_epoch
 
                     cv_result.append(result[:-1])
@@ -173,10 +179,12 @@ class Tuner(object): #review class' name
             val_dtframe = dt_frame_fscore[mask_v]
             val_byepoch = val_dtframe.groupby('epoch').mean()
             fscore_val = val_byepoch.to_numpy()[:, :-1]
+            d =fscore_val[:, 1].reshape(len(fscore_val), 1)
+            d1 = ncv[:, 3].reshape(len(fscore_val), 1)
+            ncv_f = np.append(d1, d, axis=1)
 
 
 
-                #TODO- repeticoes
 
                 # Tensorboard
             ResultsHandler.al_tensorboard(ncv, [cnn_config.num_epochs, cnn_config.learning_rate],
@@ -188,7 +196,12 @@ class Tuner(object): #review class' name
             ResultsHandler.fscore_tensorboard(fscore_train, [cnn_config.num_epochs, cnn_config.learning_rate],
                                                   self.files_config.main_dir, t='train', type='train')
             # Other files
+
             ResultsHandler.write_result_resume_row(av_cv_r, self.files_config, cnn_config)
+
+            TensorBoardHelper.hparams_write(ncv_f, folder=self.files_config.main_dir+'/hparam_tuning', hparams={'lr':cnn_config.learning_rate,
+                                                                 'ep':cnn_config.num_epochs}, ex=cnn_config.learning_rate)
+
         ResultsHandler.simple_write(dp, '{}/dp.csv'.format(self.files_config.result_path))
 
 

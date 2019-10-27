@@ -40,7 +40,12 @@ use_cuda = torch.cuda.is_available()
 
 class Trainer(object):
 
-    def __init__(self, file_config, config=None, model=None, corpus=None, verbose=True, opt_param=None):
+    def __init__(self, file_config, config=None, model=None, corpus=None, verbose=True, opt_param=None,
+                 metric='accuracy'):
+
+        self.metrics = {'accuracy': 0, 'f1-score': 1}
+        self.metric = self.metrics[metric]
+
         print('Loading data...')
         self.verbose = verbose
         if config is None:
@@ -53,7 +58,7 @@ class Trainer(object):
         if corpus is None:
             corpus = TwitterHashtagCorpus(file_config.train_file, file_config.vocab_file, self.config.dev_split,
                                           self.config.seq_length, self.config.vocab_size)
-    #DOING#####
+    #DOING#####- Mover p um helper
         self.file_config.model_file = '{}/{}'.format(self.file_config.save_path, self.model_file)
         self.file_config.results_train ='{}/{}.epochs'.format(self.file_config.result_path, self.model_file)
         self.file_config.results_train_file = None
@@ -83,7 +88,7 @@ class Trainer(object):
 
         #Optimizer and Loss Function
         self.criterion = nn.CrossEntropyLoss(size_average=False)  # nn.MultiLabelSoftMarginLoss()
-        self.optimizer = optim.Adam(opt_param, lr=self.config.learning_rate)
+        self.optimizer = optim.Adam(opt_param, lr=self.config.learning_rate, weight_decay=0.0)
 
     def get_time_dif(self, start_time):
         end_time = time.time()
@@ -119,10 +124,13 @@ class Trainer(object):
             y_pred.extend(pred)
             y_true.extend(label.data.cpu().numpy().tolist())
 
-        f = metrics.f1_score(y_true, y_pred, labels=task_labels, average=None)
+        if self.metric != 0:
+            f = metrics.f1_score(y_true, y_pred, labels=task_labels, average=None)
+        else:
+            f = None
         acc = (np.array(y_true) == np.array(y_pred)).sum()
 
-        return acc / data_len, total_loss / data_len, f
+        return acc / data_len, f, total_loss / data_len
 
     """
           Train and evaluate the model with training and validation data.
@@ -132,8 +140,10 @@ class Trainer(object):
         start_time = time.time()
         # set the mode to train
         it_loss = []
-        bt_acc = bt_loss = bv_loss = 0.0
-        best_acc = 0.0
+        best_loss = [0.0, 0.0]
+        best_metrics_train = [0.0, 0.0]
+        best_metrics_val = [0.0, 0.0]
+
         best_epoch = 0
         for epoch in tqdm(range(self.config.num_epochs)):
             # load the training data in batch
@@ -154,19 +164,26 @@ class Trainer(object):
                 self.optimizer.step()
                 # evaluate on both training and test dataset
 
-            train_acc, train_loss, f1_train = self.evaluate(self.train_data)
-            val_acc, val_loss, f1_val = self.evaluate(self.validation_data)
+            #train_acc, train_loss, f1_train = self.evaluate(self.train_data)
+            #train_acc,  f1_train, train_loss = self.evaluate(self.train_data)
+            train_metrics = self.evaluate(self.train_data)
+            val_metrics = self.evaluate(self.validation_data)
 
-            if f1 is not None:
-                ###testing##
-                f1.append([f1_val[0], f1_val[1], epoch, 1])
-                f1.append([f1_train[0], f1_train[1], epoch, 0])
-            if val_acc > best_acc:
+            """if f1 is not None and best_metrics_val[1] is not None:
+                ###testing_ TODO- arrumar##
+                f1.append([val_metrics[1][0], val_metrics[1][1], epoch, 1])
+                f1.append([train_metrics[1][0], train_metrics[1][1], epoch, 0])"""
+
+            if val_metrics[self.metric] > best_metrics_val[self.metric]:
                 # store the best result
-                best_acc = val_acc
-                bt_acc = train_acc
-                bt_loss = train_loss
-                bv_loss = val_loss
+                """if best_metrics_val[1] is not None:
+                    best_metrics_train[self.metric] = train_metrics[1][1]
+                    best_metrics_val[self.metric] = val_metrics[1][1]"""
+
+                best_metrics_train[self.metrics['accuracy']] = train_metrics[0]
+                best_metrics_val[self.metrics['accuracy']] = train_metrics[0]
+                best_loss[0] = train_metrics[2]
+                best_loss[1] = val_metrics[2]
                 best_epoch = epoch
                 improved_str = '*'
                 torch.save(self.model.state_dict(), self.file_config.model_file+'.all')
@@ -179,22 +196,32 @@ class Trainer(object):
             msg = "Epoch {0:3}, Train_loss: {1:>7.2}, Train_acc {2:>6.2%}, " \
                   + "Test_loss: {3:>6.2}, Test_acc {4:>6.2%}, Time: {5} {6}"
             if self.verbose:
-                print(msg.format(epoch + 1, train_loss, train_acc, val_loss, val_acc, time_dif, improved_str))
+                print(msg.format(epoch + 1, train_metrics[2], train_metrics[0], val_metrics[2], val_metrics[0],
+                                 time_dif, improved_str))
+            #train.sum()/self.corpus.max_labels, f1_val.sum()/self.corpus.max_labels
+            if val_metrics[1] is None:
+                v = [0.0, 0.0]
+            else:
+                v = [0.0, 0.0]#[f1[-1][1], f1[-2][1]]
+                ###testing##
+                ResultsHandler.write_row(train_metrics[1],
+                                         '{}/{}.fscoretrain'.format(self.file_config.result_path, self.model_file))
+                ResultsHandler.write_row(val_metrics[1],
+                                         '{}/{}.fscoreval'.format(self.file_config.result_path, self.model_file))
 
-            data = [epoch + 1, train_loss, train_acc, val_loss, val_acc, f1_train.sum()/self.corpus.max_labels,
-                    f1_val.sum()/self.corpus.max_labels]
+            data = [epoch + 1, train_metrics[2], train_metrics[0], val_metrics[2], val_metrics[0], v[0], v[1]]
             ResultsHandler.write_train_row(self.config, data, self.file_config)
 
-            ###testing##
-            ResultsHandler.write_row(f1_train, '{}/{}.fscoretrain'.format(self.file_config.result_path, self.model_file))
-            ResultsHandler.write_row(f1_val, '{}/{}.fscoreval'.format(self.file_config.result_path, self.model_file))
+
 
             train_data.append(data)
 
         if self.verbose:
-            print("F1 final train: {} F1 final validation {}".format(f1_train, f1_val))
+            print("F1 final train: {} F1 final validation {}".format(train_metrics[1], val_metrics[1]))
+            print("Best Metric {}".format(best_metrics_val[self.metric]))
 
-        return bt_acc, bt_loss, best_acc, bv_loss, best_epoch
+
+        return best_metrics_train[0], best_loss[0], best_metrics_val[0], best_loss[1], best_epoch
 
     def test(self, test_data):
         """

@@ -6,6 +6,7 @@ from Tuner import *
 
 
 
+
 def test_cnn_th():
     cnn_config = TCNNConfig()
     cnn_config.num_epochs = 10
@@ -126,15 +127,19 @@ def test_load(): #dif models
 def test_tuner_1KHashtags():
 
     cnn_config = TCNNConfig()
-    cnn_config.num_epochs = 4
-    file_config = FilesConfig(vocab_file='twitter_hashtag/twitterhashtags.vocab', dataset_file='twitter_hashtag/multiple.txt',
+
+    file_config = FilesConfig(vocab_file='../helpers/1kthashtag.vocab', dataset_file='twitter_hashtag/multiple.txt',
                               task='1khashtags')
     corpus = TwitterHashtagCorpus(train_file=file_config.train_file, vocab_file=file_config.vocab_file) # arrumar parametros
+    corpus.x_train = corpus.x_train[:1000, :]
+    corpus.y_train = corpus.y_train[:1000]
+    corpus.x_validation = corpus.x_train[:500, :]
+    corpus.y_validation = corpus.y_train[:500]
 
-    myTuner = Tuner(corpus, file_config)
-    epochs = (5, 6)
-    lrs = (0.0001, 0.01)
-    myTuner.random_search(5, epochs, lrs, freeze_lr=True)
+    myTuner = Tuner(corpus, file_config, rand=False)
+    epochs = (2, 6)
+    lrs = (1e-5, 1e-1)
+    myTuner.random_search(5, epochs, lrs, rep=2,freeze_lr=False, freeze_epochs=True)
     print("RS finished!\n")
 
 
@@ -257,6 +262,44 @@ def test_new_multihashtags():
     print(x)
 
 
+#TODO REMOVE
+def load_embedding(glove_file, size=100):
+    #print("loading pre-treined emb..")
+    data = []
+    g_file = open(glove_file, 'r')
+    reader = csv.reader(g_file, delimiter=' ')
+    reader.__next__()
+    for l in reader:
+        data.append([l])
+    #print(data)
+    data = np.asarray(data, dtype=float)
+    emb = torch.FloatTensor(data.reshape((-1, size)))
+    print(emb)
+    return emb
+
+def my_model(args):
+
+    return ETextCNN(config=args[0], pre_trained_emb=args[1])
+def test_pretrained_emb():
+    embedding = load_embedding('../helpers/1kthashtag.glove')
+    file_config = FilesConfig(vocab_file='../helpers/1kthashtag.vocab',
+                              dataset_file='DataSetsEraldo/dataSetSupernatural.txt', task='supernatural')
+    c = CorpusTE(train_file='DataSetsEraldo/dataSetSupernatural.txt',
+                 vocab_file='../helpers/1kthashtag.vocab')
+    x, y = c.prepare()
+    print(c.size)
+    f = RandomSplit(corpus=c, n=10, sub=350)
+    f.x = x
+    f.y = y
+    cnn_config = TCNNConfig()
+    args = [cnn_config, embedding]
+    t = Tuner(c, file_config, rand=False, callback=my_model, args=args)
+    epochs = (10, 6)
+    lrs = (1e-3, 1e-2)
+    t.random_search_rsplit(execs=2, rsplits=f, epoch_limits=epochs, lr_limits=lrs,
+                           freeze_epochs=True, freeze_lr=False)
+    print(embedding[1])
+    print('Done supernatural.')
 
 
 

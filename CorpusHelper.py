@@ -70,7 +70,7 @@ class CorpusHelper(object):
 
 class Corpus(object):
 
-    def __init__(self, sent_max_length=50, vocab_size=8000):
+    def __init__(self, sent_max_length=40, vocab_size=8000):
         self.sentence_size = sent_max_length
         self.vocab_size = vocab_size
         self.word_id = None

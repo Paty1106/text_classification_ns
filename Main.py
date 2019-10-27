@@ -3,15 +3,18 @@ import tests
 import exp
 if __name__ == '__main__':
     #exp
+    exp.time_cons()
     #exp.rs_1khashtags()
     #exp.rs_rsplit_supernatural()
-    exp.supernatural_lltrain()
+    #exp.supernatural_lltrain()
     #exp.rs_1labelthashtag()
     #exp.pre_1khashtags_rs()
     #exp.supernatural_rs()
     #exp.pre_rs_supernatural()
 
     #tests
+
+    #tests.test_pretrained_emb()
     #tests.test_new_multihashtags()
     #tests.cv_rsplit()
     #tests.train_cv()
