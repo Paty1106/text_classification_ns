@@ -123,23 +123,37 @@ def test_load(): #dif models
     ts = model_supernatural.state_dict()
 
     print("acabou")
+#TODO REMOVE
+def load_embedding(glove_file, size=100):
+    #print("loading pre-treined emb..")
+    data = []
+    g_file = open(glove_file, 'r')
+    reader = csv.reader(g_file, delimiter=' ')
+    reader.__next__()
+    for l in reader:
+        data.append([l])
+    #print(data)
+    data = np.asarray(data, dtype=float)
+    emb = torch.FloatTensor(data.reshape((-1, size)))
+    print(emb)
+    return emb
 
 def test_tuner_1KHashtags():
+    emb = load_embedding('twitter_hashtag/1kthashtag.glove')
 
-    cnn_config = TCNNConfig()
-
-    file_config = FilesConfig(vocab_file='../helpers/1kthashtag.vocab', dataset_file='twitter_hashtag/multiple.txt',
+    file_config = FilesConfig(vocab_file='twitter_hashtag/1kthashtag.vocab',
+                              dataset_file='twitter_hashtag/multiple.txt',
                               task='1khashtags')
+    corpus = TwitterHashtagCorpus(train_file=file_config.train_file,
+                                  vocab_file=file_config.vocab_file)
+    cnn_config = TCNNConfig()
     corpus = TwitterHashtagCorpus(train_file=file_config.train_file, vocab_file=file_config.vocab_file) # arrumar parametros
-    corpus.x_train = corpus.x_train[:1000, :]
-    corpus.y_train = corpus.y_train[:1000]
-    corpus.x_validation = corpus.x_train[:500, :]
-    corpus.y_validation = corpus.y_train[:500]
+
 
     myTuner = Tuner(corpus, file_config, rand=False)
-    epochs = (2, 6)
-    lrs = (1e-5, 1e-1)
-    myTuner.random_search(5, epochs, lrs, rep=2,freeze_lr=False, freeze_epochs=True)
+    epochs = (50, 6)
+    lrs = (1e-3, 1e-1)
+    myTuner.random_search(5, epochs, lrs, rep=10, freeze_lr=True, freeze_epochs=True)
     print("RS finished!\n")
 
 
@@ -262,20 +276,6 @@ def test_new_multihashtags():
     print(x)
 
 
-#TODO REMOVE
-def load_embedding(glove_file, size=100):
-    #print("loading pre-treined emb..")
-    data = []
-    g_file = open(glove_file, 'r')
-    reader = csv.reader(g_file, delimiter=' ')
-    reader.__next__()
-    for l in reader:
-        data.append([l])
-    #print(data)
-    data = np.asarray(data, dtype=float)
-    emb = torch.FloatTensor(data.reshape((-1, size)))
-    print(emb)
-    return emb
 
 def my_model(args):
 

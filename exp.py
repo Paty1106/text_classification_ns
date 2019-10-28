@@ -234,14 +234,9 @@ def time_cons():
                               task='1khashtags')
     corpus = TwitterHashtagCorpus(train_file=file_config.train_file,
                                   vocab_file=file_config.vocab_file)  # arrumar parametros
-
-
-
-
     cnn = TextCNN(config=cnn_config, pre_trained_emb=emb)
     trainer = Trainer(corpus=corpus, model=cnn, config=cnn_config, file_config=file_config, verbose=True)
     train_data = []
-
     start_time = time.time()
     result = trainer.train(train_data)
     end_time = time.time()
@@ -250,6 +245,7 @@ def time_cons():
     print(r)
     with open('tempo.txt', mode='w+') as x:
         x.write(str(r))
+
 
 def rs_rsplit_supernatural():
     file_config = FilesConfig(vocab_file='twitter_hashtag/twitterhashtags.vocab',

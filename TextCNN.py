@@ -99,7 +99,7 @@ class TCNNConfig(object): #TTextCNNODO - pegar automaticamente alguns param?
 
     dropout_prob = 0.5  # how much probability to be dropped
 
-    batch_size = 50  # batch size for training
+    batch_size = 200  # batch size for training
 
     num_classes = 125 # number of classes 125
     target_names = ['--', '-', '=', '+', '++']
@@ -108,6 +108,7 @@ class TCNNConfig(object): #TTextCNNODO - pegar automaticamente alguns param?
 
     cuda_device = 0  # cuda device to be used when available
 
+    #todo - implementar a geracao de modelos..
 
     def __str__(self):
         pass #TODO

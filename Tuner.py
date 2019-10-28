@@ -26,7 +26,13 @@ class Tuner(object): #review class' name
 
         cnn_config = TCNNConfig(num_epochs=epoch_limits[0], learning_rate=lr_limits[0])
         lr_list = Tuner.lr_list(lr_limits)
+
+        ######temp###########
+        kernels = [1, 2, 3, 4, 5]
+        #kernels = [6, 7, 8, 9, 10]
+
         for e in range(execs):
+            cnn_config.kernel_sizes = [kernels[e]]
             if self.rand:
                 if not freeze_lr:
                     cnn_config.learning_rate = lr_list[random.randint(0, len(lr_list) - 1)]
@@ -37,6 +43,7 @@ class Tuner(object): #review class' name
                     cnn_config.learning_rate = lr_list[e]
                 if not freeze_epochs:
                     cnn_config.num_epochs = random.randint(epoch_limits[0], epoch_limits[1])
+
             print("LR{0} EP{1}\n".format(cnn_config.learning_rate, cnn_config.num_epochs))
             res = []
             train_data, f1, dp = [], [], []

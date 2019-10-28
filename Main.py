@@ -3,7 +3,7 @@ import tests
 import exp
 if __name__ == '__main__':
     #exp
-    exp.time_cons()
+    #exp.time_cons()
     #exp.rs_1khashtags()
     #exp.rs_rsplit_supernatural()
     #exp.supernatural_lltrain()
@@ -23,7 +23,7 @@ if __name__ == '__main__':
     #tests.corpus()
     #tests.supernatural_acc_loss()
     #tests.supernatural_rs()
-    #tests.test_tuner_1KHashtags()
+    tests.test_tuner_1KHashtags()
     #tests.test_kfold_rs()
     #test_cnn_th()
 
