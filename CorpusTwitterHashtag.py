@@ -2,111 +2,23 @@
 
 from CorpusHelper import *
 
-class TwitterHashtagCorpusMultilable(object):
-
-    def __init__(self, train_file, vocab_file, dev_split=0.1, sent_max_lenght=40, vocab_size=8000):
-        # loading data
-        self.sent_max_lenght = sent_max_lenght
-
-        with CorpusHelper.open_file(train_file) as f:
-            x_data = []
-            y_data = []
-            # skip header
-            hashtags = f.readline()
-            self.label_to_id = self.create_hashtags_file(train_file)#self.build_label_to_id(hashtags)
-            self.max_labels = len(self.label_to_id)
-
-            for l in f:
-                l = l.strip()
-                ftrs = l.split('\t')
-                text = ftrs[0]
-                label = ftrs[-1]
-                x_data.append(text)
-                y_data.append(self.process_multilabel(label))
-
-        # save vocabulary
-        if not os.path.exists(vocab_file):
-            CorpusHelper.build_vocab(x_data, vocab_file, vocab_size)
-
-        self.words, self.word_to_id = CorpusHelper.read_vocab(vocab_file)
-        self.vocab_size = len(self.word_to_id)
-        for i in range(len(x_data)):  # tokenizing and padding
-            x_data[i] = CorpusHelper.process_text(x_data[i], self.word_to_id, sent_max_lenght, clean=False)
-
-        # print(x_data)
-        x_data = np.array(x_data)
-        y_data = np.array(y_data)
-
-        # shuffle
-        indices = np.random.permutation(np.arange(len(x_data)))
-        x_data = x_data[indices]
-        y_data = y_data[indices]
-
-        # train/dev split
-        num_train = int((1 - dev_split) * len(x_data))
-        self.x_train = x_data[:num_train]
-        self.y_train = y_data[:num_train]
-        self.x_test = x_data[num_train:]
-        self.y_test = y_data[num_train:]
-
-    def __str__(self):
-        return 'Training: {}, Testing: {}, Vocabulary: {}'.format(len(self.x_train), len(self.x_test), len(self.words))
-
-    def build_label_to_id(self, hashtags):
-        hashtags = re.sub("'",'', hashtags[1:-1])
-        hashtags = re.split(r", ", hashtags)
-        labels_dict = dict(zip(hashtags, range(len(hashtags))))
-        return labels_dict
-
-    def process_multilabel(self, label, sep=' '):
-        ex_labels = [0]*125
-        labels = label.split(sep)
-        for l in labels:
-            if l in self.label_to_id:
-                ex_labels[self.label_to_id[l]] = 1
-        """if len(labels) < self.max_labels:
-            ex_labels = [0] * (self.max_labels - len(ex_labels)) + ex_labels"""
-        return ex_labels
-
-    def create_hashtags_file(self, train_file, label_file='hashtags.label'):
-        id = 0
-        with CorpusHelper.open_file(train_file, 'r') as inFile:
-            inFile.readline()
-            for l in inFile:
-                labels = l.split('\t')[-1].split()
-                for label in labels:
-                    if id == 0:
-                        label_dict = {label: id}
-                        id = id + 1
-                    else:
-                        if label not in label_dict:
-                            dt = {label: id}
-                            id = id + 1
-                            label_dict.update(dt)
-
-        with CorpusHelper.open_file(label_file, 'w') as out_file:
-            hashtags = label_dict.keys()
-            for hashtag in hashtags:
-                out_file.write(hashtag + '\n')
-        return label_dict
-
-
-"""Multiclass problem"""
-
 class TwitterHashtagCorpus(object):
 
-    def __init__(self, train_file, vocab_file, dev_split=0.3, sent_max_length=50, vocab_size=8000):
+    def __init__(self, files, vocab_file, dev_split=0.3, sent_max_length=50, vocab_size=8000):
         # loading data
+        #files = [treino, validacao]
         self.dev_split = dev_split
         self.train_split = 0.7
         self.sent_max_length = sent_max_length
+        self.vocab_size = vocab_size
 
-        with CorpusHelper.open_file(train_file) as f:
-            x_data = []
-            y_data = []
+        #treino
+        with CorpusHelper.open_file(files[0]) as f:
+            x_data_treino = []
+            y_data_treino = []
             # skip header
             hashtags = f.readline()
-            self.label_to_id = self.create_hashtags_file(train_file)#self.build_label_to_id(hashtags)
+            self.label_to_id = self.create_hashtags_file(files[0])#self.build_label_to_id(hashtags)
             self.max_labels = len(self.label_to_id)
 
             for l in f:
@@ -114,44 +26,66 @@ class TwitterHashtagCorpus(object):
                 ftrs = l.split('\t')
                 text = ftrs[0]
                 label = ftrs[-1]
-                x_data.append(text)
+                x_data_treino.append(text)
                 ex_label = self.label_to_id[label.split()[0]]
-                y_data.append(ex_label) # Get just the first one hashtag
+                y_data_treino.append(ex_label) # Get just the first one hashtag
 
         # save vocabulary
         if not os.path.exists(vocab_file):
-            CorpusHelper.build_vocab(x_data, vocab_file, vocab_size)
+            CorpusHelper.build_vocab(x_data_treino, vocab_file, vocab_size)
 
         self.words, self.word_to_id = CorpusHelper.read_vocab(vocab_file)
-        self.vocab_size = len(self.word_to_id)
-        for i in range(len(x_data)):  # tokenizing and padding
-            x_data[i] = CorpusHelper.process_text(x_data[i], self.word_to_id, sent_max_length, clean=False)
+
+        for i in range(len(x_data_treino)):  # tokenizing and padding
+            x_data_treino[i] = CorpusHelper.process_text(x_data_treino[i], self.word_to_id, sent_max_length, clean=False)
 
         # print(x_data)
-        x_data = np.array(x_data)
-        y_data = np.array(y_data)
+        x_data_treino = np.array(x_data_treino)
+        y_data_treino = np.array(y_data_treino)
+        with CorpusHelper.open_file(files[1]) as f:
+            x_data_val = []
+            y_data_val = []
+            # skip header
+            hashtags = f.readline()
+            self.label_to_id = self.create_hashtags_file(files[1])#self.build_label_to_id(hashtags)
+            self.max_labels = len(self.label_to_id)
 
-        # shuffle
-        indices = np.random.permutation(np.arange(len(x_data)))
-        x_data = x_data[indices]
-        y_data = y_data[indices]
+            for l in f:
+                l = l.strip()
+                ftrs = l.split('\t')
+                text = ftrs[0]
+                label = ftrs[-1]
+                x_data_val.append(text)
+                ex_label = self.label_to_id[label.split()[0]]
+                y_data_val.append(ex_label) # Get just the first one hashtag
 
-        # train/validation/test split
-        dtsize = len(x_data)
-        num_train = int(self.train_split * dtsize)
-        num_val = int(dtsize*self.dev_split)
-        self.x_train = x_data[:num_train]
-        self.y_train = y_data[:num_train]
+        # save vocabulary
+        if not os.path.exists(vocab_file):
+            CorpusHelper.build_vocab(x_data_treino, vocab_file, vocab_size)
 
-        self.x_validation = x_data[num_train:num_train+num_val]
-        self.y_validation = y_data[num_train:num_train+num_val]
+        self.words, self.word_to_id = CorpusHelper.read_vocab(vocab_file)
 
-        self.x_test = x_data[num_train + num_val:]  # TODO - modificar.
-        self.y_test = y_data[num_train + num_val:]
+        for i in range(len(x_data_val)):  # tokenizing and padding
+            x_data_val[i] = CorpusHelper.process_text(x_data_val[i], self.word_to_id, sent_max_length, clean=False)
+
+        # print(x_data)
+        x_data_val = np.array(x_data_val)
+        y_data_val = np.array(y_data_val)
+
+
+        self.x_train = x_data_val
+        self.y_train = y_data_val
+
+        self.x_validation = x_data_val
+        self.y_validation = y_data_val
+
+        self.x_test = []
+        self.y_test = []
+
 
     def __str__(self):
         return 'Training: {},Validation{},Testing: {}, Vocabulary: {}'.format(len(self.x_train), len(self.x_validation),
-                                                                               len(self.x_test), self.vocab_size)
+                                                                               len(self.x_test), len(self.words))
 
     def shuffle(self, dev=None):
         if dev is None:
