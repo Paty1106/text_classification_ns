@@ -14,7 +14,7 @@ def exp_hashtags_NegSamp():
     corpus = TwitterHashtagCorpus(files=['train.txt', 'validation.txt'], vocab_file=file_config.vocab_file) # corpus
     # abre, lê, troca o indice...
 
-    cnn_config = TCNNConfig(num_epochs=200) # Configurações da rede
+    cnn_config = TCNNConfig_NegSamp(num_epochs=200) # Configurações da rede
 
     #corpus.x_train = corpus.x_train[:1000, :]
     #corpus.y_train = corpus.y_train[:1000]
