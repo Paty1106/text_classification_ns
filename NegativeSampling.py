@@ -10,9 +10,6 @@ from FilesConfig import FilesConfig
 from TextCNN_NegSamp import *
 from Trainer_NegSamp import *
 
-
-import matplotlib.pyplot as plt
-
 class NegativeSampling():
 
     def __init__(self, config):
@@ -55,11 +52,7 @@ class NegativeSampling():
 
             negative_class_vector.append(neg)
 
-     #   print(torch.tensor(negative_class_vector))
-
-        #print(torch.tensor(negative_class_vector))
         return torch.tensor(negative_class_vector)
-
 
     def negative_class(self, targets):  # Está pegando indice que pode ter sido
                                                                     #excluido no subsampling
@@ -80,8 +73,6 @@ class NegativeSampling():
             train_indices.append(int(targets[i]))
             negative_class_vector.append(train_indices)
 
-       # print(torch.tensor(negative_class_vector).shape)
-        #print(torch.tensor(negative_class_vector))
         return torch.tensor(negative_class_vector)
 
     def negative_sampling_loss(self, class_probs):
@@ -90,29 +81,15 @@ class NegativeSampling():
 
         e0 = torch.tensor((class_probs[:,n_negative_class].shape[0])*[1e-30])  # Para não zerar
         e1 = torch.tensor((n_negative_class)*[1e-30])  # Para não zerar
-        one = torch.tensor((n_negative_class)*[1.0])
-
-        #print(class_probs[:,n_negative_class])
-        #print(class_probs[:,n_negative_class] + e0, "\n")
+        one = torch.ones([n_negative_class], dtype=torch.float32)
 
         w_i = torch.log(class_probs[:,n_negative_class] + e0)
 
-       # w_i = torch.log(e0)
-
-        #print("class_probs: ", class_probs[0])
-
-        #print("w_i: ", w_i)
-
         w_ij = torch.log(one - class_probs[:,0:n_negative_class] + e1)
-        #print("w_ij: ", w_ij[0], "\n")
-
         w_ij = torch.sum(w_ij, dim = 1)
 
         s = -(w_i + w_ij)
 
-      #  print(s.shape)
-
         loss = torch.sum(s)/class_probs.shape[0]
-
 
         return loss

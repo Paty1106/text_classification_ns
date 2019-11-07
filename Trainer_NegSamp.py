@@ -23,7 +23,6 @@ from torch.utils.data import DataLoader, TensorDataset
 
 from sklearn import metrics
 
-
 from CorpusHelper import *
 from CorpusTwitterHashtag import TwitterHashtagCorpus
 
@@ -33,6 +32,8 @@ import datetime
 from TextCNN_NegSamp import *
 from FilesConfig import FilesConfig
 from ResultsHandler import ResultsHandler
+
+import matplotlib.pyplot as plt
 
 from NegativeSampling import *
 
@@ -46,7 +47,7 @@ class Trainer_NegSamp(object):
         print('Loading data...')
         self.verbose = verbose
         if config is None:
-            config = TCNNConfig()
+            config = TCNNConfig_NegSamp()
 
         self.config = config
         self.NegSamp = NegativeSampling(self.config)
@@ -90,7 +91,6 @@ class Trainer_NegSamp(object):
         #self.criterion = nn.CrossEntropyLoss(size_average=False) # Lais  # nn.MultiLabelSoftMarginLoss()
         self.criterion = self.NegSamp.negative_sampling_loss
         self.optimizer = optim.Adam(opt_param, lr=self.config.learning_rate)
-        #self.optimizer = optim.SGD(opt_param, lr=self.config.learning_rate)
 
     def get_time_dif(self, start_time):
         end_time = time.time()
@@ -181,7 +181,6 @@ class Trainer_NegSamp(object):
                 outputs = self.model(inputs, negative_class_vector)  # forward computation
 
                 loss = self.criterion(outputs) # Lais
-                #loss = self.criterion(outputs, targets)
 
                 # backward propagation and update parameters
                 loss.backward()
@@ -197,10 +196,6 @@ class Trainer_NegSamp(object):
             total_train_acc.append(train_acc)
             total_val_acc.append(val_acc)
             losses.append(total_loss)
-
-            #print(output_val)
-            print(y_pred_val, "\n")
-            #print("\n")
 
             if f1 is not None:
                 ###testing##
@@ -251,7 +246,7 @@ class Trainer_NegSamp(object):
 
         plt.tight_layout()
 
-        plt.savefig('images/acc_losses_15negsamp_0001_200ep_06_11.png')
+        plt.savefig('images/acc_losses_5negsamp_0001_200ep_06_11.png')
 
         return bt_acc, bt_loss, best_acc, bv_loss, best_epoch
 

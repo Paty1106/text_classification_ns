@@ -27,9 +27,7 @@ class TextCNN_NegSamp(nn.Module):
         self.convs = nn.ModuleList([nn.Conv1d(E, Nf, k) for k in Ks])
         self.dropout = nn.Dropout(Dr)  # a dropout layer
 
-        # Lais classificador
         #self.fc1 = nn.Linear(3 * Nf, C)  # a dense layer for classification
-        #self.fc1 = torch.sigmoid  # a dense layer for classification
 
     @staticmethod
     def conv_and_max_pool(x, conv):
@@ -46,11 +44,7 @@ class TextCNN_NegSamp(nn.Module):
 
         class_embedding = self.class_embedding(negative_class_vector) # Pega os embbedings do ruido e da palavra certa
 
-      #  print("\nclass: ", class_embedding.shape, "\n")
-
         x_cat = x_cat.view(class_embedding.shape[0],-1,1)  # Para ficar 3d
-
-      #  print("x_cat", x_cat.shape, "\n")
 
         x = torch.matmul(class_embedding, x_cat).view(class_embedding.shape[0], -1) # theta * e_c
 
@@ -80,7 +74,7 @@ class TextCNN_NegSamp(nn.Module):
 #____________________________________________________________________________________________________________________#
 
 
-class TCNNConfig(object): #TODO - pegar automaticamente alguns param?
+class TCNNConfig_NegSamp(object): #TODO - pegar automaticamente alguns param?
     """
     CNN Parameters
     """
@@ -109,7 +103,7 @@ class TCNNConfig(object): #TODO - pegar automaticamente alguns param?
 
     cuda_device = 0  # cuda device to be used when available
 
-    n_negatives_class = 15 # Classes negativas a serem atualizadas em cada iteração
+    n_negatives_class = 5 # Classes negativas a serem atualizadas em cada iteração
 
 
     def __str__(self):
