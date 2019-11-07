@@ -1,31 +1,8 @@
 
 import tests
-import exp
+import exp_NegSamp
 if __name__ == '__main__':
     #exp
-    #exp.time_cons()
-    #exp.rs_1khashtags()
-    #exp.rs_rsplit_supernatural()
-    #exp.supernatural_lltrain()
-    #exp.rs_1labelthashtag()
-    #exp.pre_1khashtags_rs()
-    #exp.supernatural_rs()
-    #exp.pre_rs_supernatural()
 
-    #tests
-
-    #tests.test_pretrained_emb()
-    #tests.test_new_multihashtags()
-    #tests.cv_rsplit()
-    #tests.train_cv()
-    #tests.test_load()
-    #tests.test_loads()
-    #tests.corpus()
-    #tests.supernatural_acc_loss()
-    #tests.supernatural_rs()
-    tests.test_tuner_1KHashtags()
-    #tests.test_kfold_rs()
-    #test_cnn_th()
-
-
-
+   # exp_NegSamp.exp_hashtags()
+    exp_NegSamp.exp_hashtags_NegSamp()
