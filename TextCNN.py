@@ -75,6 +75,11 @@ class ETextCNN(TextCNN):
         x_cat = torch.cat(x_c, 1)
         x_h = self.dropout(F.relu(self.fc0(x_cat)))
 
+       # embedded = self.embedding(inputs).permute(0, 2, 1)
+       # x = [self.conv_and_max_pool(embedded, k) for k in self.convs]  # convolution and global max pooling
+       # x_cat = self.dropout(torch.cat(x, 1))
+       # x = self.fc1(x_cat)
+
         x = self.fc1(x_h)
         return x
 
@@ -84,9 +89,11 @@ class TCNNConfig(object): #TTextCNNODO - pegar automaticamente alguns param?
     CNN Parameters
     """
 
-    def __init__(self, num_epochs=10, learning_rate=0.001):
+    def __init__(self, num_epochs=10, learning_rate=0.001, n_classes= 125):
         self.learning_rate = learning_rate  # learning rate
         self.num_epochs = num_epochs  # total number of epochs
+        self.num_classes = n_classes # number of classes 125
+
 
     embedding_dim = 100  # embedding vector size
     seq_length = 40  # maximum length of sequence
@@ -99,9 +106,9 @@ class TCNNConfig(object): #TTextCNNODO - pegar automaticamente alguns param?
 
     dropout_prob = 0.5  # how much probability to be dropped
 
-    batch_size = 200  # batch size for training
+    batch_size = 8  # batch size for training
 
-    num_classes = 125 # number of classes 125
+   # num_classes = 125 # number of classes 125
     target_names = ['--', '-', '=', '+', '++']
 
     dev_split = 0.1  # percentage of dev data

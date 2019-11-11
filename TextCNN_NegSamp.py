@@ -46,11 +46,11 @@ class TextCNN_NegSamp(nn.Module):
 
         x_cat = x_cat.view(class_embedding.shape[0],-1,1)  # Para ficar 3d
 
-        x = torch.matmul(class_embedding, x_cat).view(class_embedding.shape[0], -1) # theta * e_c
+        logit = torch.matmul(class_embedding, x_cat).view(class_embedding.shape[0], -1) # theta * e_c
 
-        class_probs = torch.sigmoid(x)
+        #class_probs = torch.sigmoid(logit)
 
-        return class_probs
+        return logit
 
     def load_pre_trained(self, emb_file, conv_file): # sem a ultima camada
         #Embeddings
@@ -79,9 +79,11 @@ class TCNNConfig_NegSamp(object): #TODO - pegar automaticamente alguns param?
     CNN Parameters
     """
 
-    def __init__(self, num_epochs=10, learning_rate=0.001):
+    def __init__(self, num_epochs=10, learning_rate=0.001, n_classes= 125):
         self.learning_rate = learning_rate  # learning rate
         self.num_epochs = num_epochs  # total number of epochs
+        self.num_classes = n_classes # number of classes 125
+
 
     embedding_dim = 50  # embedding vector size
     seq_length = 50  # maximum length of sequence
@@ -96,14 +98,13 @@ class TCNNConfig_NegSamp(object): #TODO - pegar automaticamente alguns param?
 
     batch_size = 8  # batch size for training
 
-    num_classes = 125 # number of classes 125
     target_names = ['--', '-', '=', '+', '++']
 
     dev_split = 0.1  # percentage of dev data
 
     cuda_device = 0  # cuda device to be used when available
 
-    n_negatives_class = 5 # Classes negativas a serem atualizadas em cada iteração
+    n_negatives_class = 15 # Classes negativas a serem atualizadas em cada iteração
 
 
     def __str__(self):
