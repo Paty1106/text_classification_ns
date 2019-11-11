@@ -19,9 +19,11 @@ class TwitterHashtagCorpus(object):
             # skip header
             hashtags = f.readline()
             self.label_to_id = self.create_hashtags_file(files[0])#self.build_label_to_id(hashtags)
-            self.max_labels = len(self.label_to_id)
+            self.max_labels_train = len(self.label_to_id)
 
+            cont = 0
             for l in f:
+                cont = cont + 1
                 l = l.strip()
                 ftrs = l.split('\t')
                 text = ftrs[0]
@@ -42,6 +44,8 @@ class TwitterHashtagCorpus(object):
         # print(x_data)
         x_data_treino = np.array(x_data_treino)
         y_data_treino = np.array(y_data_treino)
+
+
         with CorpusHelper.open_file(files[1]) as f:
             x_data_val = []
             y_data_val = []
@@ -61,7 +65,7 @@ class TwitterHashtagCorpus(object):
 
         # save vocabulary
         if not os.path.exists(vocab_file):
-            CorpusHelper.build_vocab(x_data_treino, vocab_file, vocab_size)
+            CorpusHelper.build_vocab(x_data_val, vocab_file, vocab_size)
 
         self.words, self.word_to_id = CorpusHelper.read_vocab(vocab_file)
 
@@ -73,8 +77,8 @@ class TwitterHashtagCorpus(object):
         y_data_val = np.array(y_data_val)
 
 
-        self.x_train = x_data_val
-        self.y_train = y_data_val
+        self.x_train = x_data_treino
+        self.y_train = y_data_treino
 
         self.x_validation = x_data_val
         self.y_validation = y_data_val
@@ -113,12 +117,13 @@ class TwitterHashtagCorpus(object):
         labels_dict = dict(zip(hashtags, range(len(hashtags))))
         return labels_dict
 
-    def create_hashtags_file(self, train_file, label_file='hashtags.label'):
+    def create_hashtags_file(self, train_file, label_file='twitter_hashtag/hashtags_clean.label'):
         id = 0
         with CorpusHelper.open_file(train_file, 'r') as inFile:
             inFile.readline()
             for l in inFile:
                 labels = l.split('\t')[-1].split()
+               # print(labels,"\n\n")
                 for label in labels:
                     if id == 0:
                         label_dict = {label: id}
@@ -133,6 +138,8 @@ class TwitterHashtagCorpus(object):
             hashtags = label_dict.keys()
             for hashtag in hashtags:
                 out_file.write(hashtag + '\n')
+
+        #print(len(label_dict))
         return label_dict
 
 #twitter_corpus = TwitterHashtagCorpus('out.txt','twitterhashtags.vocab')
