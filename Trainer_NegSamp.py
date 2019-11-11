@@ -67,7 +67,7 @@ class Trainer_NegSamp(object):
     ##########
 
         self.corpus = corpus
-        self.config.vocab_size = len(self.corpus.words)
+        self.config.vocab_size = self.corpus.vocab_size
         self.config.target_names = self.corpus.label_to_id.keys()
         self.config.num_classes = len(self.corpus.label_to_id)
         self.train_data = TensorDataset(torch.LongTensor(self.corpus.x_train), torch.LongTensor(self.corpus.y_train))

@@ -9,10 +9,11 @@ import numpy as np
 
 def exp_hashtags_NegSamp():
 
-    file_config = FilesConfig(vocab_file='twitter_hashtag/twitterhashtags.vocab', dataset_file= 'twitter_hashtag/multiple.txt')
+    file_config = FilesConfig(vocab_file='twitter_hashtag/1kthashtag.vocab', dataset_file= 'twitter_hashtag/multiple.txt')
+
     corpus = TwitterHashtagCorpus(files=['train.txt', 'validation.txt'], vocab_file=file_config.vocab_file) # corpus
 
-  #  file_config = FilesConfig(vocab_file='twitter_hashtag/twitterhashtags.vocab', dataset_file= 'twitter_hashtag/17mi-dataset_clean.txt')
+  #  file_config = FilesConfig(vocab_file='twitter_hashtag/1kthashtag.vocab', dataset_file= 'twitter_hashtag/17mi-dataset_clean.txt')
    # corpus = TwitterHashtagCorpus(files=['train_clean.txt', 'validation_clean.txt'], vocab_file=file_config.vocab_file) # corpus
 
     cnn_config = TCNNConfig_NegSamp(num_epochs=150, n_classes = corpus.max_labels_train) # Configurações da rede
@@ -26,9 +27,9 @@ def exp_hashtags_NegSamp():
 
 def exp_hashtags():
 
+ #   file_config = FilesConfig(vocab_file='twitter_hashtag/1kthashtag.vocab', dataset_file= 'twitter_hashtag/multiple.txt')
+    #file_config = FilesConfig(vocab_file='twitter_hashtag/1kthashtag.vocab', dataset_file= 'twitter_hashtag/17mi-dataset_clean.txt')
     file_config = FilesConfig(vocab_file='twitter_hashtag/twitterhashtags.vocab', dataset_file= 'twitter_hashtag/multiple.txt')
-    #file_config = FilesConfig(vocab_file='twitter_hashtag/twitterhashtags.vocab', dataset_file= 'twitter_hashtag/17mi-dataset_clean.txt')
-
     corpus = TwitterHashtagCorpus(files=['train.txt', 'validation.txt'], vocab_file=file_config.vocab_file) # corpus
 
     cnn_config = TCNNConfig(num_epochs=150) # Configurações da rede
