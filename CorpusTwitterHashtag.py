@@ -68,7 +68,7 @@ class TwitterHashtagCorpus(object):
             CorpusHelper.build_vocab(x_data_val, vocab_file, vocab_size)
 
         self.words, self.word_to_id = CorpusHelper.read_vocab(vocab_file)
-
+        self.vocab_size = len(self.word_to_id)
         for i in range(len(x_data_val)):  # tokenizing and padding
             x_data_val[i] = CorpusHelper.process_text(x_data_val[i], self.word_to_id, sent_max_length, clean=False)
 
