@@ -19,6 +19,7 @@ It takes about 2 minutes for training 20 epochs on a GTX 970 GPU.
 
 import torch.optim as optim
 from torch.autograd import Variable
+import torch.nn.functional as F
 from torch.utils.data import DataLoader, TensorDataset
 
 from sklearn import metrics
@@ -88,8 +89,10 @@ class Trainer_NegSamp(object):
             self.model.cuda()
 
         #Optimizer and Loss Function
+
         #self.criterion = nn.CrossEntropyLoss(size_average=False) # Lais  # nn.MultiLabelSoftMarginLoss()
-        self.criterion = self.NegSamp.negative_sampling_loss
+        #self.criterion = self.NegSamp.negative_sampling_loss
+        self.criterion = F.binary_cross_entropy_with_logits
         self.optimizer = optim.Adam(opt_param, lr=self.config.learning_rate)
 
     def get_time_dif(self, start_time):
@@ -117,12 +120,17 @@ class Trainer_NegSamp(object):
                 data, label = data.cuda(), label.cuda()
 
             with torch.no_grad():
-                negative_all_class_vector = torch.tensor(data.shape[0]*[list(self.corpus.label_to_id.values())])
-                output = self.model(data, negative_all_class_vector) # Na validação, quais classes negativas eu uso?
 
-                losses = self.criterion(output)
+                negative_all_class_vector = torch.tensor(data.shape[0]*[list(self.corpus.label_to_id.values())])
+                logits = self.model(data, negative_all_class_vector) # Na validação, quais classes negativas eu uso?
+
+                targets_zero_one = torch.zeros([logits.shape[0], self.config.num_classes], dtype=torch.float32)
+                targets_zero_one[:, self.config.n_negatives_class] = torch.ones(logits.shape[0])
+
+                losses = self.criterion(logits, targets_zero_one)
 
             total_loss += losses.item()
+            output = torch.sigmoid(logits)
             pred = torch.max(output.data, dim=1)[1].cpu().numpy().tolist() #torch.max -> (value, index)
             pred_value = torch.max(output.data, dim=1)[0].cpu().numpy().tolist() #torch.max -> (value, index)
 
@@ -152,20 +160,27 @@ class Trainer_NegSamp(object):
         total_train_acc = []
         total_val_acc = []
 
-        hashtag_class = np.asarray(self.train_data.tensors[1])
-        unique, counts = np.unique(hashtag_class, return_counts=True)
-        frequency = dict(zip(unique, counts))
+        #print("here", self.train_data.tensors[1].shape)
+
+       # hashtag_class = np.asarray(self.train_data.tensors[1])
+       # print(len(hashtag_class))
+       # unique, counts = np.unique(hashtag_class, return_counts=True)
+       # frequency = dict(zip(unique, counts))
+
+        frequency = Counter(np.array(self.train_data.tensors[1]))
+        #print("Quantidade de hashtags: ", len(hashtags_counts))
+        #print(hashtags_counts.keys())
+
+      #  print(frequency)
 
         for epoch in tqdm(range(self.config.num_epochs)):
 
             total_loss = 0
             # load the training data in batch
             self.model.train()
-
-            train_data_subsampling = self.NegSamp.subsampling(self.train_data, frequency)
-
-            self.train_data = TensorDataset(torch.LongTensor(train_data_subsampling[0]),
-                                            torch.LongTensor(train_data_subsampling[1]))
+            #train_data_subsampling = self.NegSamp.subsampling(self.train_data, frequency)
+            #self.train_data = TensorDataset(torch.LongTensor(train_data_subsampling[0]),
+            #                                torch.LongTensor(train_data_subsampling[1]))
 
             train_loader = DataLoader(self.train_data, batch_size=self.config.batch_size)
 
@@ -178,9 +193,23 @@ class Trainer_NegSamp(object):
                 self.optimizer.zero_grad()
                 negative_class_vector = self.NegSamp.negative_class(targets)
 
-                outputs = self.model(inputs, negative_class_vector)  # forward computation
+                logits = self.model(inputs, negative_class_vector)  # forward computation
 
-                loss = self.criterion(outputs) # Lais
+                targets_zero_one = torch.zeros([logits.shape[0], self.config.n_negatives_class + 1], dtype=torch.float32)
+                targets_zero_one[:, self.config.n_negatives_class] =  torch.ones(logits.shape[0])
+
+            #    w = []
+            #    weight = []
+            #    for batch in range(negative_class_vector.shape[0]):
+            #        w = []
+            #        for i in range(negative_class_vector.shape[1]):
+            #            el = negative_class_vector[batch,i]
+            #            w.append(1/frequency[int(el)])
+            #        weight.append(w)
+
+            #    weight = torch.tensor(weight)
+              #  loss = self.criterion(logits, targets_zero_one, weight=weight) # Lais
+                loss = self.criterion(logits, targets_zero_one)
 
                 # backward propagation and update parameters
                 loss.backward()
@@ -234,19 +263,25 @@ class Trainer_NegSamp(object):
         #if self.verbose:
             #print("F1 final train: {} F1 final validation {}".format(f1_train, f1_val))
 
-        plt.subplot(211)
+
+        #plt.figure(figsize=(12,10))
+
+        #plt.subplot(211)
         plt.plot(total_train_acc, color = 'blue',  label = 'Train')
         plt.plot(total_val_acc, color = 'red', label = 'Validation')
-        plt.legend()
-        plt.title("Negative Sampling Accuracy")
+        plt.legend(loc=4)
+        plt.yticks(np.arange(0.15, 1.05, 0.05))
+        plt.grid()
+        plt.title("15-Negative Sampling Accuracy")
 
-        plt.subplot(212)
-        plt.plot(losses, color = 'blue')
-        plt.title("Negative Sampling Loss")
+      #  plt.subplot(212)
+       # plt.figure(figsize=(20,10))
+      #  plt.plot(losses, color = 'blue')
+       # plt.title("Negative Sampling Loss")
 
-        plt.tight_layout()
+        #plt.tight_layout()
 
-        plt.savefig('images/acc_losses_5negsamp_0001_200ep_06_11.png')
+        plt.savefig('images/acc_15negsamp_0001_bal_new_loss_150ep_10_11_.png')
 
         return bt_acc, bt_loss, best_acc, bv_loss, best_epoch
 
