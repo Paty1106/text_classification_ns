@@ -17,6 +17,7 @@ class CorpusHelper(object):
         :param mode: 'r' and 'w' for read and write respectively
         """
         return open(filename, mode, encoding='utf-8', errors='ignore')
+
     @staticmethod
     def clean(text):
         text = re.sub(r"[^A-Za-z0-9(),!?\'\`]", " ", text)
@@ -74,7 +75,7 @@ class Corpus(object):
         self.sentence_size = sent_max_length
         self.vocab_size = vocab_size
         self.word_id = None
-        self.words = None #REVER
+        self.words = None  # REVER
         self.size = None
 
         self.x_train = None
@@ -85,18 +86,17 @@ class Corpus(object):
         self.y_test = None
 
     def prepare(self, callback, args=None):
-        return callback(args) # x_data, y_data
+        return callback(args)  # x_data, y_data
 
     @staticmethod
-    def distribution(y): # TODO
+    def distribution(y):  # TODO
         dt = pandas.DataFrame(y.reshape(-1, 1), columns=['class'])
         print(dt)
         dist = dt.groupby('class').get_group(1)
         print(dist)
         nd = dist.to_numpy().sum()
-        dist = (1/len(y))*nd
+        dist = (1 / len(y)) * nd
         return dist
-
 
     def shuffle(self, x_data, y_data, dev_split=0.3, train_split=0.7, test_split=None):
         # shuffle
@@ -118,11 +118,11 @@ class Corpus(object):
         else:
             num_validation = 0
 
-        if test_split is not None: #REVER
+        if test_split is not None:  # REVER
             self.x_test = x_data[num_train + num_validation:]
             self.y_test = y_data[num_train + num_validation:]
 
-    def join(self):#TO REMOVE
+    def join(self):  # TO REMOVE
 
         x = np.append(self.x_train, self.x_validation, axis=0)
         y = np.append(self.y_train, self.y_validation)
@@ -134,5 +134,5 @@ class Corpus(object):
     def __str__(self):
         test_size = 0 if self.x_test is None else self.x_test
         return 'Training: {},Validation: {},Testing: {}, Vocabulary: {}'.format(len(self.x_train),
-                                                                                  len(self.x_validation),
-                                                                                  test_size, len(self.words))
+                                                                                len(self.x_validation),
+                                                                                test_size, len(self.words))

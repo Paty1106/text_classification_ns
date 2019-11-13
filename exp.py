@@ -5,7 +5,9 @@ from KFold import KFold
 from Tuner import *
 import time
 import tests
-def model_load(args):   #return a model
+
+
+def model_load(args):  # return a model
 
     model_supernatural = TextCNN(config=args[0])
     model_supernatural.use_pre_trained_layers(args[1], args[2])
@@ -61,7 +63,6 @@ def pre_rs_supernatural():
 
 
 def supernatural_rs():
-
     file_config = FilesConfig(vocab_file='twitter_hashtag/twitterhashtags.vocab',
                               dataset_file='DataSetsEraldo/dataSetSupernatural.txt', task='supernatural')
     c = CorpusTE(train_file='DataSetsEraldo/dataSetSupernatural.txt',
@@ -77,7 +78,8 @@ def supernatural_rs():
     myTuner = Tuner(c, file_config)
     epochs = (100, 0)
     lrs = (1e-5, 1e-1)
-    myTuner.random_search_cv(execs=6, epoch_limits=epochs, lr_limits=lrs, cv=10, folds=f, freeze_epochs=True, freeze_lr=False)
+    myTuner.random_search_cv(execs=6, epoch_limits=epochs, lr_limits=lrs, cv=10, folds=f, freeze_epochs=True,
+                             freeze_lr=False)
     print("RS finished!\n")
 
 
@@ -90,7 +92,7 @@ def pre_1khashtags_rs():
     x = np.append(c.x_train, c.x_validation, axis=0)
     y = np.append(c.y_train, c.y_validation)
 
-    #remocao das classes nao presentes
+    # remocao das classes nao presentes
     count = np.zeros(len(c.label_to_id), dtype=np.int)
     classes_ade = np.zeros_like(count, dtype=np.int)
     for i in y:
@@ -104,7 +106,7 @@ def pre_1khashtags_rs():
             k = keys[l]
             del c.label_to_id[k]
 
-    #remover classe 100- muitos exemplos
+    # remover classe 100- muitos exemplos
     del c.label_to_id[keys[100]]
     count[100] = 0
 
@@ -128,13 +130,13 @@ def pre_1khashtags_rs():
         y_line[s] = classes_ade[y_line[s]]
     values = c.label_to_id.values()
 
-    #Split
-    c.x_train = x_line[:int(0.7*len(y_line)), :]
+    # Split
+    c.x_train = x_line[:int(0.7 * len(y_line)), :]
     c.x_validation = x_line[int(0.7 * len(y_line)):, :]
     c.y_train = y_line[:int(0.7 * len(y_line))]
     c.y_validation = y_line[int(0.7 * len(y_line)):]
 
-    #Treino
+    # Treino
     data = []
     d = []
     f1s_val = []
@@ -144,11 +146,12 @@ def pre_1khashtags_rs():
     # Tensorboard
     ResultsHandler.al_tensorboard(dt[:, 1:5], [cnn_config.num_epochs, cnn_config.learning_rate],
                                   file_config.main_dir)
-    ResultsHandler.s_tensorboard(dt[:,  1:5], [cnn_config.num_epochs, cnn_config.learning_rate],
+    ResultsHandler.s_tensorboard(dt[:, 1:5], [cnn_config.num_epochs, cnn_config.learning_rate],
                                  file_config.main_dir)
     # Other files
     ResultsHandler.write_result_resume_row(d, file_config, cnn_config)
     ResultsHandler.simple_write(f1s_val, '{}/f1val.csv'.format(file_config.result_path))
+
 
 def rs_1labelthashtag():
     file_config = FilesConfig(vocab_file='twitterhashtags.vocab', dataset_file='out.txt', base_dir='twitter_hashtag',
@@ -221,8 +224,6 @@ def rs_1khashtags():
     print('Done 1khashtag.')
 
 
-
-
 def time_cons():
     cnn_config = TCNNConfig()
     cnn_config.batch_size = 200
@@ -230,7 +231,8 @@ def time_cons():
     cnn_config.learning_rate = 1e-3
     emb = tests.load_embedding('twitter_hashtag/1kthashtag.glove')
 
-    file_config = FilesConfig(vocab_file='twitter_hashtag/1kthashtag.vocab', dataset_file='twitter_hashtag/multiple.txt',
+    file_config = FilesConfig(vocab_file='twitter_hashtag/1kthashtag.vocab',
+                              dataset_file='twitter_hashtag/multiple.txt',
                               task='1khashtags')
     corpus = TwitterHashtagCorpus(train_file=file_config.train_file,
                                   vocab_file=file_config.vocab_file)  # arrumar parametros

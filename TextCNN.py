@@ -38,15 +38,15 @@ class TextCNN(nn.Module):
         x = [self.conv_and_max_pool(embedded, k) for k in self.convs]  # convolution and global max pooling
         x_cat = self.dropout(torch.cat(x, 1))
         x = self.fc1(x_cat)
-        #x = self.fc1(self.dropout(torch.cat(x, 1)))  # concatenation and dropout
+        # x = self.fc1(self.dropout(torch.cat(x, 1)))  # concatenation and dropout
 
         return x
 
-    def load_pre_trained(self, emb_file, conv_file): # sem a ultima camada
-        #Embeddings
+    def load_pre_trained(self, emb_file, conv_file):  # sem a ultima camada
+        # Embeddings
         emb = torch.load(emb_file)
         self.embedding.load_state_dict(emb)
-        #Conv. Filters
+        # Conv. Filters
         conv = torch.load(conv_file)
         self.convs.load_state_dict(conv)
 
@@ -57,6 +57,8 @@ class TextCNN(nn.Module):
     def save(self, paths):  # [emb,conv...]
         torch.save(self.embedding.state_dict(), paths[0])
         torch.save(self.convs.state_dict(), paths[1])
+
+
 # _______________________________________________________
 
 
@@ -71,35 +73,34 @@ class ETextCNN(TextCNN):
         # Conv1d takes in (batch, channels, seq_len), but raw embedded is (batch, seq_len, channels)
         embedded = self.embedding(inputs).permute(0, 2, 1)
         x_c = [self.conv_and_max_pool(embedded, k) for k in self.convs]  # convolution and global max pooling
-        #x_cat = self.dropout(torch.cat(x, 1))
+        # x_cat = self.dropout(torch.cat(x, 1))
         x_cat = torch.cat(x_c, 1)
         x_h = self.dropout(F.relu(self.fc0(x_cat)))
 
-       # embedded = self.embedding(inputs).permute(0, 2, 1)
-       # x = [self.conv_and_max_pool(embedded, k) for k in self.convs]  # convolution and global max pooling
-       # x_cat = self.dropout(torch.cat(x, 1))
-       # x = self.fc1(x_cat)
+        # embedded = self.embedding(inputs).permute(0, 2, 1)
+        # x = [self.conv_and_max_pool(embedded, k) for k in self.convs]  # convolution and global max pooling
+        # x_cat = self.dropout(torch.cat(x, 1))
+        # x = self.fc1(x_cat)
 
         x = self.fc1(x_h)
         return x
 
 
-class TCNNConfig(object): #TTextCNNODO - pegar automaticamente alguns param?
+class TCNNConfig(object):  # TTextCNNODO - pegar automaticamente alguns param?
     """
     CNN Parameters
     """
 
-    def __init__(self, num_epochs=10, learning_rate=0.001, n_classes= 125):
+    def __init__(self, num_epochs=10, learning_rate=0.001, n_classes=125):
         self.learning_rate = learning_rate  # learning rate
         self.num_epochs = num_epochs  # total number of epochs
-        self.num_classes = n_classes # number of classes 125
-
+        self.num_classes = n_classes  # number of classes 125
 
     embedding_dim = 100  # embedding vector size
     seq_length = 40  # maximum length of sequence
     vocab_size = 8000  # most common words
 
-    num_filters = 150 #100  # number of the convolution filters (feature maps)
+    num_filters = 150  # 100  # number of the convolution filters (feature maps)
     kernel_sizes = [3, 4, 5]  # three kind of kernels (windows)
 
     hidden_dim = 600  # hidden size of fully connected layer
@@ -108,14 +109,14 @@ class TCNNConfig(object): #TTextCNNODO - pegar automaticamente alguns param?
 
     batch_size = 8  # batch size for training
 
-   # num_classes = 125 # number of classes 125
+    # num_classes = 125 # number of classes 125
     target_names = ['--', '-', '=', '+', '++']
 
     dev_split = 0.1  # percentage of dev data
 
     cuda_device = 0  # cuda device to be used when available
 
-    #todo - implementar a geracao de modelos..
+    # todo - implementar a geracao de modelos..
 
     def __str__(self):
-        pass #TODO
+        pass  # TODO
